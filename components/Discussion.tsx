@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 
-export default function DiscussionPage() {
+export default function Discussion() {
     const [newPost, setNewPost] = useState("");
 
     const squads = [

@@ -83,7 +83,7 @@ export default function LoginPage() {
     setIsGoogleLoading(true);
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: "/",
+      callbackURL: "/dashboard",
     });
   };
 
@@ -91,7 +91,7 @@ export default function LoginPage() {
     setIsGithubLoading(true);
     await authClient.signIn.social({
       provider: "github",
-      callbackURL: "/",
+      callbackURL: "/dashboard",
     });
   };
 
@@ -106,7 +106,7 @@ export default function LoginPage() {
         {
           onSuccess: () => {
             toast.success("Login successful");
-            router.push("/");
+            router.push("/dashboard");
           },
           onError: (ctx) => {
             const message = getSignInErrorMessage(ctx.error);

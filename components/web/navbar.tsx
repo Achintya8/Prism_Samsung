@@ -21,6 +21,7 @@ import {
   LogOut,
   Settings,
   LoaderIcon,
+  MessageSquare,
 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -75,7 +76,7 @@ export function NavBar() {
         {session && (
           <>
             <Link
-              href="/"
+              href="/dashboard"
               className={buttonVariants({
                 variant: "ghost",
               })}
@@ -89,9 +90,17 @@ export function NavBar() {
                 variant: "ghost",
               })}
             >
+              
               <Trophy className="size-4" />
               Leaderboard
             </Link>
+            <Link
+        href="/discussion"
+        className={buttonVariants({ variant: "ghost" })}
+      >
+        <MessageSquare className="size-4" /> {/* You'll need to import MessageSquare from lucide-react */}
+        Discussion
+      </Link>
             <Link
               href="/activities"
               className={buttonVariants({
