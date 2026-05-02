@@ -37,10 +37,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${isActive(item.href)
-                    ? 'bg-blue-50 text-blue-600'
-                    : 'text-gray-600 hover:bg-gray-50'
-                    }`}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                    isActive(item.href)
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-600 hover:bg-gray-50"
+                  }`}
                 >
                   <item.icon className="w-5 h-5" />
                   {item.label}
@@ -52,9 +53,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1">
-        {children}
-      </main>
+      <main className="flex-1">{children}</main>
 
       {/* Mobile Navigation */}
       <nav className="md:hidden bg-white border-t border-gray-200 fixed bottom-0 left-0 right-0 z-10">
@@ -63,10 +62,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-1 py-2 px-1 rounded-lg transition-colors ${isActive(item.href)
-                ? 'bg-blue-50 text-blue-600'
-                : 'text-gray-600'
-                }`}
+              className={`flex flex-col items-center gap-1 py-2 px-1 rounded-lg transition-colors ${
+                isActive(item.href) ? "bg-blue-50 text-blue-600" : "text-gray-600"
+              }`}
             >
               <item.icon className="w-5 h-5" />
               <span className="text-xs">{item.mobileLabel}</span>

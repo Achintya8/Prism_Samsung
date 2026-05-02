@@ -1,16 +1,11 @@
 "use client";
 
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldError, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { SocialAuthButtons } from "@/components/web/social-auth";
+import { SocialAuthButtons } from "@/components/auth/social-auth";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/app/schemas/auth";
@@ -36,7 +31,7 @@ export default function LoginPage() {
 
   useEffect(() => {
     const method = authClient.getLastUsedLoginMethod();
-    setLastUsedMethod(method);  
+    setLastUsedMethod(method);
   }, []);
 
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -96,9 +91,7 @@ export default function LoginPage() {
       {/* Header */}
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Sign in with Google, GitHub, or email
-        </p>
+        <p className="mt-2 text-sm text-muted-foreground">Sign in with Google, GitHub, or email</p>
       </div>
 
       {/* Social Buttons */}
@@ -113,9 +106,7 @@ export default function LoginPage() {
       {/* Divider */}
       <div className="relative my-4 flex items-center">
         <Separator className="flex-1" />
-        <span className="px-4 text-sm text-muted-foreground">
-          Or continue with email
-        </span>
+        <span className="px-4 text-sm text-muted-foreground">Or continue with email</span>
         <Separator className="flex-1" />
       </div>
 
@@ -146,9 +137,7 @@ export default function LoginPage() {
                   />
                   <Mail className="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 </div>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
               </Field>
             )}
           />
@@ -159,9 +148,7 @@ export default function LoginPage() {
             control={form.control}
             render={({ field, fieldState }) => (
               <Field>
-                <FieldLabel className="text-sm font-semibold">
-                  Password
-                </FieldLabel>
+                <FieldLabel className="text-sm font-semibold">Password</FieldLabel>
                 <div className="relative">
                   <Input
                     aria-invalid={fieldState.invalid}
@@ -176,16 +163,10 @@ export default function LoginPage() {
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     tabIndex={-1}
                   >
-                    {showPassword ? (
-                      <EyeOff className="size-4" />
-                    ) : (
-                      <Eye className="size-4" />
-                    )}
+                    {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                   </button>
                 </div>
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
+                {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                 <div className="flex justify-end">
                   <Link
                     href="/forgot-password"
@@ -204,11 +185,7 @@ export default function LoginPage() {
             disabled={anyLoading}
             className="mt-1 h-11 w-full cursor-pointer rounded-lg bg-foreground text-background hover:bg-foreground/90"
           >
-            {isLoading ? (
-              <LoaderIcon className="size-4 animate-spin" />
-            ) : (
-              "Login"
-            )}
+            {isLoading ? <LoaderIcon className="size-4 animate-spin" /> : "Login"}
           </Button>
         </FieldGroup>
       </form>
@@ -227,17 +204,11 @@ export default function LoginPage() {
       {/* Terms Footer */}
       <p className="mt-2 text-center text-sm text-muted-foreground">
         By clicking continue, you agree to our{" "}
-        <Link
-          href="/terms"
-          className="underline underline-offset-4 hover:text-foreground"
-        >
+        <Link href="/terms" className="underline underline-offset-4 hover:text-foreground">
           Terms of Service
         </Link>{" "}
         and{" "}
-        <Link
-          href="/privacy"
-          className="underline underline-offset-4 hover:text-foreground"
-        >
+        <Link href="/privacy" className="underline underline-offset-4 hover:text-foreground">
           Privacy Policy
         </Link>
         .

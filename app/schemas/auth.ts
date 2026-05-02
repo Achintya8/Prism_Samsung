@@ -15,12 +15,9 @@ export const signupSchema = z
       .refine((file) => !file || file.size <= 5 * 1024 * 1024, {
         message: "Image must be less than 5MB",
       })
-      .refine(
-        (file) =>
-          !file ||
-          ["image/jpeg", "image/png", "image/webp"].includes(file.type),
-        { message: "Only JPEG, PNG, and WebP images are allowed" }
-      ),
+      .refine((file) => !file || ["image/jpeg", "image/png", "image/webp"].includes(file.type), {
+        message: "Only JPEG, PNG, and WebP images are allowed",
+      }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",

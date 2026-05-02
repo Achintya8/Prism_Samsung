@@ -2,7 +2,7 @@ import { Flame, Calendar } from "lucide-react";
 import { currentUserStats } from "./data/mockData";
 
 export function StreakDisplay() {
-  const today = new Date('2026-04-30');
+  const today = new Date("2026-04-30");
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date(today);
     date.setDate(date.getDate() - (6 - i));
@@ -31,24 +31,16 @@ export function StreakDisplay() {
           const isCompleted = completedDays[index];
 
           return (
-            <div
-              key={index}
-              className="flex-1 flex flex-col items-center"
-            >
+            <div key={index} className="flex-1 flex flex-col items-center">
               <div
-                className={`w-full aspect-square rounded-lg flex items-center justify-center mb-1 transition-all ${isCompleted
-                    ? 'bg-orange-500 text-white'
-                    : 'bg-gray-100 text-gray-400'
-                  } ${isToday ? 'ring-2 ring-orange-400 ring-offset-2' : ''}`}
+                className={`w-full aspect-square rounded-lg flex items-center justify-center mb-1 transition-all ${
+                  isCompleted ? "bg-orange-500 text-white" : "bg-gray-100 text-gray-400"
+                } ${isToday ? "ring-2 ring-orange-400 ring-offset-2" : ""}`}
               >
-                {isCompleted ? (
-                  <Flame className="w-4 h-4" />
-                ) : (
-                  <Calendar className="w-4 h-4" />
-                )}
+                {isCompleted ? <Flame className="w-4 h-4" /> : <Calendar className="w-4 h-4" />}
               </div>
               <span className="text-xs text-gray-500">
-                {date.toLocaleDateString('en-US', { weekday: 'short' })}
+                {date.toLocaleDateString("en-US", { weekday: "short" })}
               </span>
             </div>
           );
@@ -57,7 +49,8 @@ export function StreakDisplay() {
 
       <div className="mt-4 p-3 bg-orange-50 rounded-lg">
         <p className="text-sm text-orange-800 text-center">
-          Keep it up! You're {currentUserStats.longestStreak - currentUserStats.currentStreak} days away from your best streak!
+          Keep it up! You're {currentUserStats.longestStreak - currentUserStats.currentStreak} days
+          away from your best streak!
         </p>
       </div>
     </div>

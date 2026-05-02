@@ -1,14 +1,8 @@
 "use client";
 
-import { NavBar } from "@/components/web/navbar";
+import { NavBar } from "@/components/navbar/navbar";
 import { authClient } from "@/lib/auth-client";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -189,18 +183,13 @@ export default function SettingsPage() {
                   toast.error("Current password is incorrect.");
                   break;
                 case "WEAK_PASSWORD":
-                  toast.error(
-                    "New password is too weak. Please use a stronger one."
-                  );
+                  toast.error("New password is too weak. Please use a stronger one.");
                   break;
                 default:
-                  toast.error(
-                    ctx.error.message ||
-                      "Something went wrong. Please try again."
-                  );
+                  toast.error(ctx.error.message || "Something went wrong. Please try again.");
               }
             },
-          }
+          },
         );
       } else {
         // OAuth-only user — call set-password API directly
@@ -212,17 +201,13 @@ export default function SettingsPage() {
         });
 
         if (res.ok) {
-          toast.success(
-            "Password set successfully! You can now sign in with email and password."
-          );
+          toast.success("Password set successfully! You can now sign in with email and password.");
           setNewPassword("");
           setConfirmPassword("");
           setHasPassword(true);
         } else {
           const data = await res.json().catch(() => null);
-          toast.error(
-            data?.message || "Something went wrong. Please try again."
-          );
+          toast.error(data?.message || "Something went wrong. Please try again.");
         }
       }
     } catch {
@@ -272,7 +257,7 @@ export default function SettingsPage() {
 
   if (isPending) {
     return (
-      <div>
+      <div className="max-w-7xl mx-auto w-full md:px-6 lg:px-8">
         <NavBar />
         <div className="flex items-center justify-center py-32">
           <div className="flex flex-col items-center gap-3">
@@ -286,15 +271,13 @@ export default function SettingsPage() {
 
   if (!session) {
     return (
-      <div>
+      <div className="max-w-7xl mx-auto w-full md:px-6 lg:px-8">
         <NavBar />
         <div className="flex items-center justify-center py-32">
           <Card className="w-full max-w-md">
             <CardHeader className="text-center">
               <CardTitle className="text-xl">Not Authenticated</CardTitle>
-              <CardDescription>
-                Please sign in to access settings.
-              </CardDescription>
+              <CardDescription>Please sign in to access settings.</CardDescription>
             </CardHeader>
           </Card>
         </div>
@@ -303,7 +286,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div>
+    <div className="max-w-7xl mx-auto w-full md:px-6 lg:px-8">
       <NavBar />
 
       <div className="py-8">
@@ -323,9 +306,7 @@ export default function SettingsPage() {
                 <Palette className="size-4" />
                 Appearance
               </CardTitle>
-              <CardDescription>
-                Customize how ProductivityHub looks on your device.
-              </CardDescription>
+              <CardDescription>Customize how ProductivityHub looks on your device.</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid gap-3 sm:grid-cols-3">
@@ -354,17 +335,13 @@ export default function SettingsPage() {
                       >
                         <Icon
                           className={`size-5 ${
-                            isActive
-                              ? "text-foreground"
-                              : "text-muted-foreground"
+                            isActive ? "text-foreground" : "text-muted-foreground"
                           }`}
                         />
                       </div>
                       <div className="text-center">
                         <p className="text-sm font-medium">{option.label}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {option.description}
-                        </p>
+                        <p className="text-xs text-muted-foreground">{option.description}</p>
                       </div>
                     </button>
                   );
@@ -391,9 +368,7 @@ export default function SettingsPage() {
                 {/* Current Password — only if user already has one */}
                 {hasPassword && (
                   <div className="space-y-2">
-                    <Label className="text-muted-foreground">
-                      Current Password
-                    </Label>
+                    <Label className="text-muted-foreground">Current Password</Label>
                     <div className="relative">
                       <Input
                         type={showCurrentPassword ? "text" : "password"}
@@ -404,9 +379,7 @@ export default function SettingsPage() {
                       />
                       <button
                         type="button"
-                        onClick={() =>
-                          setShowCurrentPassword(!showCurrentPassword)
-                        }
+                        onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
                         tabIndex={-1}
                       >
@@ -437,11 +410,7 @@ export default function SettingsPage() {
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
                       tabIndex={-1}
                     >
-                      {showNewPassword ? (
-                        <EyeOff className="size-4" />
-                      ) : (
-                        <Eye className="size-4" />
-                      )}
+                      {showNewPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                     </button>
                   </div>
                   {newPassword && newPassword.length < 8 && (
@@ -453,9 +422,7 @@ export default function SettingsPage() {
 
                 {/* Confirm Password */}
                 <div className="space-y-2">
-                  <Label className="text-muted-foreground">
-                    Confirm New Password
-                  </Label>
+                  <Label className="text-muted-foreground">Confirm New Password</Label>
                   <div className="relative">
                     <Input
                       type={showConfirmPassword ? "text" : "password"}
@@ -466,9 +433,7 @@ export default function SettingsPage() {
                     />
                     <button
                       type="button"
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
                       tabIndex={-1}
                     >
@@ -480,9 +445,7 @@ export default function SettingsPage() {
                     </button>
                   </div>
                   {confirmPassword && newPassword !== confirmPassword && (
-                    <p className="text-xs text-destructive">
-                      Passwords do not match
-                    </p>
+                    <p className="text-xs text-destructive">Passwords do not match</p>
                   )}
                 </div>
 
@@ -517,9 +480,7 @@ export default function SettingsPage() {
                     <Monitor className="size-4" />
                     Active Sessions
                   </CardTitle>
-                  <CardDescription>
-                    Manage your active sessions across devices.
-                  </CardDescription>
+                  <CardDescription>Manage your active sessions across devices.</CardDescription>
                 </div>
                 {sessions.length > 1 && (
                   <Button
@@ -529,9 +490,7 @@ export default function SettingsPage() {
                     disabled={isRevokingAll}
                     className="cursor-pointer text-xs text-destructive hover:text-destructive"
                   >
-                    {isRevokingAll ? (
-                      <LoaderIcon className="size-3 animate-spin mr-1" />
-                    ) : null}
+                    {isRevokingAll ? <LoaderIcon className="size-3 animate-spin mr-1" /> : null}
                     Revoke All Others
                   </Button>
                 )}
@@ -561,16 +520,12 @@ export default function SettingsPage() {
                         <div className="flex items-center gap-3">
                           <div
                             className={`rounded-full p-2 ${
-                              isCurrentSession
-                                ? "bg-emerald-500/10"
-                                : "bg-muted"
+                              isCurrentSession ? "bg-emerald-500/10" : "bg-muted"
                             }`}
                           >
                             <Monitor
                               className={`size-4 ${
-                                isCurrentSession
-                                  ? "text-emerald-500"
-                                  : "text-muted-foreground"
+                                isCurrentSession ? "text-emerald-500" : "text-muted-foreground"
                               }`}
                             />
                           </div>
@@ -599,9 +554,7 @@ export default function SettingsPage() {
                                     <span>&middot;</span>
                                   </>
                                 )}
-                              <span>
-                                Signed in {formatSessionDate(s.createdAt)}
-                              </span>
+                              <span>Signed in {formatSessionDate(s.createdAt)}</span>
                             </div>
                           </div>
                         </div>
@@ -652,21 +605,16 @@ export default function SettingsPage() {
               ) : (
                 <div className="space-y-4 rounded-lg border border-destructive/30 bg-destructive/5 p-4">
                   <div>
-                    <p className="text-sm font-medium text-destructive">
-                      Are you absolutely sure?
-                    </p>
+                    <p className="text-sm font-medium text-destructive">Are you absolutely sure?</p>
                     <p className="mt-1 text-xs text-muted-foreground">
-                      This action cannot be undone. This will permanently delete
-                      your account and remove all your data from our servers.
+                      This action cannot be undone. This will permanently delete your account and
+                      remove all your data from our servers.
                     </p>
                   </div>
 
                   <div className="space-y-2">
                     <Label className="text-sm text-muted-foreground">
-                      Type{" "}
-                      <span className="font-mono font-semibold text-destructive">
-                        DELETE
-                      </span>{" "}
+                      Type <span className="font-mono font-semibold text-destructive">DELETE</span>{" "}
                       to confirm
                     </Label>
                     <Input

@@ -6,7 +6,7 @@ export function Leaderboard() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
+        <div className="bg-linear-to-r from-blue-600 to-purple-600 p-6 text-white">
           <div className="flex items-center gap-3 mb-2">
             <Trophy className="w-8 h-8" />
             <h1 className="text-2xl font-semibold">College Leaderboard</h1>
@@ -15,7 +15,7 @@ export function Leaderboard() {
         </div>
 
         {/* Top 3 Podium */}
-        <div className="p-6 bg-gradient-to-b from-gray-50 to-white">
+        <div className="p-6 bg-linear-to-b from-gray-50 to-white">
           <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto">
             {/* 2nd Place */}
             <div className="flex flex-col items-center pt-8">
@@ -27,7 +27,9 @@ export function Leaderboard() {
                   <span className="text-sm font-semibold text-gray-700">2</span>
                 </div>
               </div>
-              <p className="mt-2 font-semibold text-gray-900 text-sm text-center">{leaderboardData[1].name}</p>
+              <p className="mt-2 font-semibold text-gray-900 text-sm text-center">
+                {leaderboardData[1].name}
+              </p>
               <p className="text-xs text-gray-500">{leaderboardData[1].points} pts</p>
             </div>
 
@@ -41,7 +43,9 @@ export function Leaderboard() {
                   <Trophy className="w-5 h-5 text-yellow-900" />
                 </div>
               </div>
-              <p className="mt-2 font-semibold text-gray-900 text-center">{leaderboardData[0].name}</p>
+              <p className="mt-2 font-semibold text-gray-900 text-center">
+                {leaderboardData[0].name}
+              </p>
               <p className="text-sm text-gray-500">{leaderboardData[0].points} pts</p>
             </div>
 
@@ -55,7 +59,9 @@ export function Leaderboard() {
                   <span className="text-sm font-semibold text-orange-700">3</span>
                 </div>
               </div>
-              <p className="mt-2 font-semibold text-gray-900 text-sm text-center">{leaderboardData[2].name}</p>
+              <p className="mt-2 font-semibold text-gray-900 text-sm text-center">
+                {leaderboardData[2].name}
+              </p>
               <p className="text-xs text-gray-500">{leaderboardData[2].points} pts</p>
             </div>
           </div>
@@ -66,19 +72,21 @@ export function Leaderboard() {
           {leaderboardData.map((entry) => (
             <div
               key={entry.rank}
-              className={`flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors ${entry.name === 'You' ? 'bg-blue-50 hover:bg-blue-100' : ''
-                }`}
+              className={`flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors ${
+                entry.name === "You" ? "bg-blue-50 hover:bg-blue-100" : ""
+              }`}
             >
               {/* Rank */}
-              <div className="w-10 flex-shrink-0">
+              <div className="w-10 shrink-0">
                 {entry.rank <= 3 ? (
                   <Medal
-                    className={`w-6 h-6 ${entry.rank === 1
-                        ? 'text-yellow-500'
+                    className={`w-6 h-6 ${
+                      entry.rank === 1
+                        ? "text-yellow-500"
                         : entry.rank === 2
-                          ? 'text-gray-400'
-                          : 'text-orange-400'
-                      }`}
+                          ? "text-gray-400"
+                          : "text-orange-400"
+                    }`}
                   />
                 ) : (
                   <span className="text-gray-500 font-medium">#{entry.rank}</span>
@@ -87,10 +95,9 @@ export function Leaderboard() {
 
               {/* Avatar */}
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${entry.name === 'You'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-700'
-                  }`}
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
+                  entry.name === "You" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"
+                }`}
               >
                 {entry.avatar}
               </div>
@@ -99,7 +106,7 @@ export function Leaderboard() {
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-gray-900 truncate">
                   {entry.name}
-                  {entry.name === 'You' && (
+                  {entry.name === "You" && (
                     <span className="ml-2 text-xs font-normal text-blue-600">(You)</span>
                   )}
                 </p>

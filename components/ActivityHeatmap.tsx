@@ -2,15 +2,15 @@ import { heatmapData } from "./data/mockData";
 
 export function ActivityHeatmap() {
   const getColor = (count: number) => {
-    if (count === 0) return 'bg-gray-100';
-    if (count <= 2) return 'bg-green-200';
-    if (count <= 4) return 'bg-green-400';
-    if (count <= 6) return 'bg-green-600';
-    return 'bg-green-700';
+    if (count === 0) return "bg-gray-100";
+    if (count <= 2) return "bg-green-200";
+    if (count <= 4) return "bg-green-400";
+    if (count <= 6) return "bg-green-600";
+    return "bg-green-700";
   };
 
   // Group data by weeks
-  const weeks: typeof heatmapData[] = [];
+  const weeks: (typeof heatmapData)[] = [];
   for (let i = 0; i < heatmapData.length; i += 7) {
     weeks.push(heatmapData.slice(i, i + 7));
   }
@@ -18,11 +18,11 @@ export function ActivityHeatmap() {
   // Get month labels
   const getMonthLabel = (weekIndex: number) => {
     const date = new Date(weeks[weekIndex][0].date);
-    return date.toLocaleDateString('en-US', { month: 'short' });
+    return date.toLocaleDateString("en-US", { month: "short" });
   };
 
   const monthLabels: { month: string; position: number }[] = [];
-  let currentMonth = '';
+  let currentMonth = "";
   weeks.forEach((week, index) => {
     const month = getMonthLabel(index);
     if (month !== currentMonth) {
