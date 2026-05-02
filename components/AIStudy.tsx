@@ -1,12 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, BookOpen, BrainCircuit, Pencil, ChevronRight, ArrowLeft, FileText } from "lucide-react";
+import {
+  Plus,
+  BookOpen,
+  BrainCircuit,
+  Pencil,
+  ChevronRight,
+  ArrowLeft,
+  FileText,
+} from "lucide-react";
 import { subjects } from "./data/mockData";
-import type { Subject, Note } from "./data/mockData";
+import type { Subject, Note } from "@/types";
 
 export function AIStudy() {
-  const [view, setView] = useState<'subjects' | 'notes' | 'noteDetail' | 'quiz' | 'whiteboard'>('subjects');
+  const [view, setView] = useState<"subjects" | "notes" | "noteDetail" | "quiz" | "whiteboard">(
+    "subjects",
+  );
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [showNewSubject, setShowNewSubject] = useState(false);
@@ -14,20 +24,20 @@ export function AIStudy() {
 
   const handleSubjectClick = (subject: Subject) => {
     setSelectedSubject(subject);
-    setView('notes');
+    setView("notes");
   };
 
   const handleNoteClick = (note: Note) => {
     setSelectedNote(note);
-    setView('noteDetail');
+    setView("noteDetail");
   };
 
   const handleBack = () => {
-    if (view === 'noteDetail') {
-      setView('notes');
+    if (view === "noteDetail") {
+      setView("notes");
       setSelectedNote(null);
-    } else if (view === 'notes') {
-      setView('subjects');
+    } else if (view === "notes") {
+      setView("subjects");
       setSelectedSubject(null);
     }
   };
@@ -37,7 +47,7 @@ export function AIStudy() {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-1">
-          {view !== 'subjects' && (
+          {view !== "subjects" && (
             <button onClick={handleBack} className="p-2 hover:bg-gray-100 rounded-lg">
               <ArrowLeft className="w-5 h-5 text-gray-700" />
             </button>
@@ -45,14 +55,16 @@ export function AIStudy() {
           <h1 className="text-2xl font-semibold text-gray-900">ClawMind</h1>
         </div>
         <p className="text-sm text-gray-500">
-          {view === 'subjects' && 'Organize your study materials by subject'}
-          {view === 'notes' && selectedSubject && `${selectedSubject.name} - ${selectedSubject.notesCount} notes`}
-          {view === 'noteDetail' && selectedNote && selectedNote.title}
+          {view === "subjects" && "Organize your study materials by subject"}
+          {view === "notes" &&
+            selectedSubject &&
+            `${selectedSubject.name} - ${selectedSubject.notesCount} notes`}
+          {view === "noteDetail" && selectedNote && selectedNote.title}
         </p>
       </div>
 
       {/* Subjects View */}
-      {view === 'subjects' && (
+      {view === "subjects" && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="font-semibold text-gray-900">Your Subjects</h2>
@@ -94,7 +106,9 @@ export function AIStudy() {
                 className="bg-white rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors cursor-pointer"
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-12 h-12 ${subject.color} rounded-lg flex items-center justify-center`}>
+                  <div
+                    className={`w-12 h-12 ${subject.color} rounded-lg flex items-center justify-center`}
+                  >
                     <BookOpen className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
@@ -110,7 +124,7 @@ export function AIStudy() {
       )}
 
       {/* Notes View */}
-      {view === 'notes' && selectedSubject && (
+      {view === "notes" && selectedSubject && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
             <h2 className="font-semibold text-gray-900">Notes</h2>
@@ -174,7 +188,7 @@ export function AIStudy() {
           {/* Quick Actions */}
           <div className="grid grid-cols-2 gap-3 mt-6">
             <button
-              onClick={() => setView('quiz')}
+              onClick={() => setView("quiz")}
               className="p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-300 transition-colors"
             >
               <BrainCircuit className="w-6 h-6 text-purple-600 mb-2" />
@@ -182,7 +196,7 @@ export function AIStudy() {
               <p className="text-sm text-gray-500">Test your knowledge</p>
             </button>
             <button
-              onClick={() => setView('whiteboard')}
+              onClick={() => setView("whiteboard")}
               className="p-4 bg-white border border-gray-200 rounded-xl hover:border-blue-300 transition-colors"
             >
               <Pencil className="w-6 h-6 text-blue-600 mb-2" />
@@ -194,20 +208,27 @@ export function AIStudy() {
       )}
 
       {/* Note Detail View */}
-      {view === 'noteDetail' && selectedNote && (
+      {view === "noteDetail" && selectedNote && (
         <div className="space-y-4">
           <div className="bg-white rounded-xl p-6 border border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">{selectedNote.title}</h2>
             <div className="prose prose-sm max-w-none">
               <h3 className="text-base font-semibold text-gray-900 mt-4 mb-2">Key Concepts</h3>
               <ul className="text-gray-700 space-y-1">
-                <li>Binary Trees: hierarchical data structure with nodes having at most two children</li>
+                <li>
+                  Binary Trees: hierarchical data structure with nodes having at most two children
+                </li>
                 <li>Tree Traversal: In-order, Pre-order, Post-order, Level-order</li>
-                <li>Binary Search Trees (BST): left subtree contains smaller values, right contains larger</li>
+                <li>
+                  Binary Search Trees (BST): left subtree contains smaller values, right contains
+                  larger
+                </li>
                 <li>Time Complexity: Search O(log n) average, O(n) worst case</li>
               </ul>
 
-              <h3 className="text-base font-semibold text-gray-900 mt-4 mb-2">Important Formulas</h3>
+              <h3 className="text-base font-semibold text-gray-900 mt-4 mb-2">
+                Important Formulas
+              </h3>
               <ul className="text-gray-700 space-y-1">
                 <li>Maximum nodes at level L: 2^L</li>
                 <li>Maximum nodes in tree of height H: 2^(H+1) - 1</li>
@@ -216,14 +237,15 @@ export function AIStudy() {
 
               <h3 className="text-base font-semibold text-gray-900 mt-4 mb-2">Summary</h3>
               <p className="text-gray-700">
-                Binary trees are fundamental data structures used for efficient searching, sorting, and hierarchical data representation.
-                Understanding tree traversal algorithms is crucial for problem-solving.
+                Binary trees are fundamental data structures used for efficient searching, sorting,
+                and hierarchical data representation. Understanding tree traversal algorithms is
+                crucial for problem-solving.
               </p>
             </div>
 
             <div className="mt-6 pt-4 border-t border-gray-200 flex gap-3">
               <button
-                onClick={() => setView('quiz')}
+                onClick={() => setView("quiz")}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 Take Quiz
@@ -237,7 +259,7 @@ export function AIStudy() {
       )}
 
       {/* Quiz View */}
-      {view === 'quiz' && (
+      {view === "quiz" && (
         <div className="space-y-4">
           <div className="bg-white rounded-xl p-6 border border-gray-200">
             <div className="flex justify-between items-center mb-4">
@@ -246,9 +268,11 @@ export function AIStudy() {
             </div>
 
             <div className="mb-6">
-              <p className="text-gray-900 mb-4">What is the time complexity of searching in a balanced Binary Search Tree?</p>
+              <p className="text-gray-900 mb-4">
+                What is the time complexity of searching in a balanced Binary Search Tree?
+              </p>
               <div className="space-y-2">
-                {['O(1)', 'O(log n)', 'O(n)', 'O(n log n)'].map((option, idx) => (
+                {["O(1)", "O(log n)", "O(n)", "O(n log n)"].map((option, idx) => (
                   <button
                     key={idx}
                     className="w-full text-left p-3 border-2 border-gray-200 rounded-lg hover:border-blue-300 transition-colors"
@@ -281,21 +305,18 @@ export function AIStudy() {
       )}
 
       {/* Whiteboard View */}
-      {view === 'whiteboard' && (
+      {view === "whiteboard" && (
         <div className="space-y-4">
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="p-3 border-b border-gray-200 flex items-center gap-2">
-              <button
-                onClick={handleBack}
-                className="p-2 hover:bg-gray-100 rounded"
-              >
+              <button onClick={handleBack} className="p-2 hover:bg-gray-100 rounded">
                 <ArrowLeft className="w-4 h-4" />
               </button>
               <button className="p-2 hover:bg-gray-100 rounded">
                 <Pencil className="w-4 h-4" />
               </button>
               <div className="flex gap-1">
-                {['#000000', '#EF4444', '#3B82F6', '#10B981', '#F59E0B'].map((color) => (
+                {["#000000", "#EF4444", "#3B82F6", "#10B981", "#F59E0B"].map((color) => (
                   <button
                     key={color}
                     className="w-6 h-6 rounded border-2 border-gray-300"
@@ -311,7 +332,7 @@ export function AIStudy() {
                 Save
               </button>
             </div>
-            <div className="bg-white" style={{ height: '400px' }}>
+            <div className="bg-white" style={{ height: "400px" }}>
               <canvas className="w-full h-full cursor-crosshair" />
             </div>
           </div>

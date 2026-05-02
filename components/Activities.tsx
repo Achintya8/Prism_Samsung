@@ -9,8 +9,8 @@ import { ActivityCard } from "./ActivityCard";
 export function Activities() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [categories, setCategories] = useState(extracurricularCategories);
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [customActivity, setCustomActivity] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [customActivity, setCustomActivity] = useState("");
   const [isOther, setIsOther] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -22,8 +22,8 @@ export function Activities() {
     }
 
     // Reset form
-    setSelectedCategory('');
-    setCustomActivity('');
+    setSelectedCategory("");
+    setCustomActivity("");
     setIsOther(false);
     setShowAddForm(false);
   };
@@ -41,7 +41,7 @@ export function Activities() {
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           {showAddForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
-          <span className="hidden sm:inline">{showAddForm ? 'Cancel' : 'Add Activity'}</span>
+          <span className="hidden sm:inline">{showAddForm ? "Cancel" : "Add Activity"}</span>
         </button>
       </div>
 
@@ -63,10 +63,11 @@ export function Activities() {
                       setSelectedCategory(category);
                       setIsOther(false);
                     }}
-                    className={`p-3 rounded-lg border-2 text-sm transition-colors ${selectedCategory === category && !isOther
-                      ? 'border-blue-600 bg-blue-50 text-blue-700'
-                      : 'border-gray-200 hover:border-gray-300 text-gray-700'
-                      }`}
+                    className={`p-3 rounded-lg border-2 text-sm transition-colors ${
+                      selectedCategory === category && !isOther
+                        ? "border-blue-600 bg-blue-50 text-blue-700"
+                        : "border-gray-200 hover:border-gray-300 text-gray-700"
+                    }`}
                   >
                     {category}
                   </button>
@@ -75,12 +76,13 @@ export function Activities() {
                   type="button"
                   onClick={() => {
                     setIsOther(true);
-                    setSelectedCategory('');
+                    setSelectedCategory("");
                   }}
-                  className={`p-3 rounded-lg border-2 text-sm transition-colors ${isOther
-                    ? 'border-blue-600 bg-blue-50 text-blue-700'
-                    : 'border-gray-200 hover:border-gray-300 text-gray-700'
-                    }`}
+                  className={`p-3 rounded-lg border-2 text-sm transition-colors ${
+                    isOther
+                      ? "border-blue-600 bg-blue-50 text-blue-700"
+                      : "border-gray-200 hover:border-gray-300 text-gray-700"
+                  }`}
                 >
                   Other
                 </button>
