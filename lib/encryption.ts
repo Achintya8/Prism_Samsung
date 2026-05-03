@@ -17,9 +17,23 @@ export function encrypt(text: string): string {
   return iv.toString('hex') + ':' + encrypted.toString('hex')
 }
 
-export function decrypt(payload: string): string {
-  if (!payload) return ''
+export function decrypt(payload: string | null | undefined): string {
+  // Defensive: ensure payload is a string before attempting to split.
+  // Add lightweight diagnostics to catch unexpected types in production.
+  if (!payload || typeof payload !== 'string') {
+    console.warn('decrypt called with non-string payload', {
+      type: payload === null ? 'null' : typeof payload,
+      constructorName: payload && (payload as any).constructor ? (payload as any).constructor.name : undefined,
+    })
+    return ''
+  }
+
   try {
+    // Log the first few characters to help diagnose malformed values (avoid full secret leak)
+    if (process.env.NODE_ENV !== 'production') {
+      console.debug('decrypt payload preview:', payload.slice(0, 48))
+    }
+
     const [ivHex, encryptedHex] = payload.split(':')
     if (!ivHex || !encryptedHex) return payload
     const key = getKey()
