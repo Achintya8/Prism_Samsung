@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server'
-import { headers } from 'next/headers'
-import { auth } from '@/lib/auth'
 import connectToDB from '@/lib/mongodb'
 import { User } from '@/lib/models/User'
 import { getLeaderboard, type Metric, type Period } from '@/lib/feature-store'
@@ -32,7 +30,6 @@ export async function GET(request: Request) {
   }
 
   // DB-backed leaderboard
-  const session = await auth.api.getSession({ headers: await headers() })
   await connectToDB()
   const users = await User.find().sort({ totalPoints: -1, createdAt: 1 }).limit(20).lean()
 
@@ -43,20 +40,8 @@ export async function GET(request: Request) {
     totalPoints: user.totalPoints ?? 0,
     currentStreak: user.currentStreak ?? 0,
     rank: index + 1,
-    isCurrentUser: session?.user?.id === user._id.toString(),
+    isCurrentUser: false,
   }))
-
-  if (leaderboard.length === 0 && session?.user?.id) {
-    leaderboard.push({
-      userId: session.user.id,
-      name: session.user.name || 'You',
-      email: session.user.email || '',
-      totalPoints: 0,
-      currentStreak: 0,
-      rank: 1,
-      isCurrentUser: true,
-    })
-  }
 
   return NextResponse.json({ ok: true, leaderboard })
 }

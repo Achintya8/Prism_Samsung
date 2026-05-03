@@ -59,4 +59,7 @@ const UserSchema = new Schema<IUser>(
   { timestamps: true, collection: 'user' }
 );
 
+// Index for leaderboard queries: sort by totalPoints (desc), then createdAt (asc)
+UserSchema.index({ totalPoints: -1, createdAt: 1 });
+
 export const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);

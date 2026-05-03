@@ -3,6 +3,7 @@ import { headers } from 'next/headers'
 import { auth } from '@/lib/auth'
 import connectToDB from '@/lib/mongodb'
 import { Subject } from '@/lib/models/Subject'
+import mongoose from 'mongoose'
 
 export async function GET(request: Request) {
   const session = await auth.api.getSession({ headers: await headers() })
@@ -17,10 +18,9 @@ export async function GET(request: Request) {
     }
 
     await connectToDB()
-    const { ObjectId } = require('mongodb')
     let oid;
     try {
-      oid = new ObjectId(subjectId.trim());
+      oid = new mongoose.Types.ObjectId(subjectId.trim());
     } catch (e) {
       return NextResponse.json({ ok: false, error: 'invalid id format' }, { status: 400 })
     }
@@ -59,10 +59,9 @@ export async function POST(request: Request) {
     }
 
     await connectToDB()
-    const { ObjectId } = require('mongodb')
     let oid;
     try {
-      oid = new ObjectId(subjectId.trim());
+      oid = new mongoose.Types.ObjectId(subjectId.trim());
     } catch (e) {
       return NextResponse.json({ ok: false, error: 'invalid id format' }, { status: 400 })
     }
@@ -75,11 +74,11 @@ export async function POST(request: Request) {
     
     const whiteboardWithId = {
       ...whiteboard,
-      _id: new ObjectId(),
+      _id: new mongoose.Types.ObjectId(),
     }
 
     const result = await (Subject as any).collection.findOneAndUpdate(
-      { _id: oid, userId: new ObjectId(session.user.id) },
+      { _id: oid, userId: new mongoose.Types.ObjectId(session.user.id) },
       { $push: { whiteboards: whiteboardWithId } },
       { returnDocument: 'after' }
     )
@@ -123,11 +122,10 @@ export async function DELETE(request: Request) {
     }
 
     await connectToDB()
-    const { ObjectId } = require('mongodb')
     
     let oid;
     try {
-      oid = new ObjectId(subjectId);
+      oid = new mongoose.Types.ObjectId(subjectId);
     } catch (e) {
       return NextResponse.json({ ok: false, error: 'invalid id format' }, { status: 400 })
     }

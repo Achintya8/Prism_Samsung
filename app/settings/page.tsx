@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
+  Eye,
+  Check,
   EyeOff,
   KeyRound,
   LoaderIcon,
@@ -348,10 +350,10 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto w-full px-4 md:px-6 lg:px-8">
+    <div className="min-h-screen flex flex-col items-center w-full px-4 md:px-6 lg:px-8">
       <NavBar />
 
-      <div className="py-8">
+      <div className="py-8 w-full max-w-2xl">
         {/* Page Header */}
         <div className="mb-8 max-w-2xl mx-auto">
           <h1 className="text-3xl font-bold tracking-tight">Settings</h1>

@@ -99,6 +99,31 @@ export function Activities() {
     return () => window.clearTimeout(id);
   }, [refreshPageData]);
 
+  // If the user has never synced platforms before, run a one-time sync when
+  // Activities loads and we have platform usernames available. The server will
+  // set `lastPlatformSyncAt` so this only runs once per user.
+  useEffect(() => {
+    if (profile.lastPlatformSyncAt !== null) return;
+    if (!profile.githubUsername && !profile.leetcodeUsername) return;
+
+    // Fire-and-forget the initial sync; UI state will update when it completes
+    void (async () => {
+      try {
+        setSyncing(true);
+        const response = await fetch('/api/platform/sync', { method: 'POST' });
+        const json = await response.json();
+        if (response.ok && json?.ok) {
+          window.dispatchEvent(new Event('activity:logged'));
+          await refreshPageData();
+        }
+      } catch (e) {
+        // ignore failures for initial sync; user can press Sync manually
+      } finally {
+        setSyncing(false);
+      }
+    })();
+  }, [profile.lastPlatformSyncAt, profile.githubUsername, profile.leetcodeUsername, refreshPageData]);
+
   function chooseOption(option: ActivityOption) {
     setSelectedOption(option);
     setValue(String(option.defaultValue));

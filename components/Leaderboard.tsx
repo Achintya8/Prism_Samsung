@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import { Medal, Trophy } from "lucide-react";
+import { Medal, Trophy, RefreshCcw } from "lucide-react";
 
 type LeaderboardEntry = {
   userId?: string
@@ -80,24 +80,61 @@ function PodiumEntry({ entry, place }: { entry: LeaderboardEntry; place: 'first'
 
 export function Leaderboard() {
   const [list, setList] = useState<LeaderboardEntry[]>([])
+  const [userEntry, setUserEntry] = useState<LeaderboardEntry | null>(null)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    let mounted = true
-    async function load() {
+    // Fetch user's rank immediately (fast, single query)
+    const loadUserRank = async () => {
       try {
-        const res = await fetch('/api/leaderboard')
-        if (!res.ok) return
-        const json = await res.json()
-        const data = Array.isArray(json?.leaderboard) ? json.leaderboard : json?.leaderboard?.top
-        if (json?.ok && Array.isArray(data) && mounted) {
-          setList(data.map(normalizeEntry))
+        const res = await fetch('/api/leaderboard/my-rank')
+        if (res.ok) {
+          const json = await res.json()
+          if (json?.ok && json?.userEntry) {
+            setUserEntry(normalizeEntry(json.userEntry, 0))
+          }
         }
       } catch {}
     }
-    load()
-    const id = setInterval(load, 5000)
-    return () => { mounted = false; clearInterval(id) }
+
+    // Fetch full leaderboard in parallel (slower)
+    const loadFullLeaderboard = async () => {
+      setLoading(true)
+      try {
+        const res = await fetch('/api/leaderboard')
+        if (res.ok) {
+          const json = await res.json()
+          const data = Array.isArray(json?.leaderboard) ? json.leaderboard : json?.leaderboard?.top
+          if (json?.ok && Array.isArray(data)) {
+            setList(data.map(normalizeEntry))
+          }
+        }
+      } catch {}
+      finally {
+        setLoading(false)
+      }
+    }
+
+    // Start both in parallel
+    void loadUserRank()
+    void loadFullLeaderboard()
   }, [])
+
+  const load = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch('/api/leaderboard')
+      if (!res.ok) return
+      const json = await res.json()
+      const data = Array.isArray(json?.leaderboard) ? json.leaderboard : json?.leaderboard?.top
+      if (json?.ok && Array.isArray(data)) {
+        setList(data.map(normalizeEntry))
+      }
+    } catch {}
+    finally {
+      setLoading(false)
+    }
+  }
 
   const entries = list
   const podiumEntries = [
@@ -111,12 +148,44 @@ export function Leaderboard() {
       <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border overflow-hidden">
         {/* Header */}
         <div className="bg-linear-to-r from-blue-600 to-purple-600 p-6 text-white">
-          <div className="flex items-center gap-3 mb-2">
-            <Trophy className="w-8 h-8" />
-            <h1 className="text-2xl font-semibold">College Leaderboard</h1>
+          <div className="flex items-center gap-3 mb-2 justify-between">
+            <div className="flex items-center gap-3">
+              <Trophy className="w-8 h-8" />
+              <h1 className="text-2xl font-semibold">College Leaderboard</h1>
+            </div>
+            <button
+              onClick={load}
+              disabled={loading}
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
+              title="Refresh leaderboard"
+            >
+              <RefreshCcw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+            </button>
           </div>
           <p className="text-blue-100">Top performers this month</p>
         </div>
+
+        {/* Your Rank Section */}
+        {userEntry && (
+          <div className="bg-blue-50 border-b border-blue-200 p-4 sm:p-6">
+            <p className="text-xs text-blue-600 font-semibold uppercase tracking-wider mb-3">Your Rank</p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-semibold text-lg">
+                  {userEntry.avatar}
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900">{userEntry.name}</p>
+                  <p className="text-sm text-gray-600">#{userEntry.rank} • {userEntry.currentStreak} day streak</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-blue-600">{userEntry.totalPoints}</p>
+                <p className="text-xs text-gray-500">points</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Top 3 Podium */}
         <div className="p-6 bg-gradient-to-b from-gray-50 to-white">
