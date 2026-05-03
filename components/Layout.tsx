@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Trophy, Activity, User, MessageCircle } from "lucide-react";
+import { ThemeSelector } from "./ThemeSelector";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -21,14 +22,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <header className="bg-card border-b border-border sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
               <Activity className="w-8 h-8 text-blue-600" />
-              <h1 className="text-xl font-semibold text-gray-900">Claw Mind</h1>
+              <h1 className="text-xl font-semibold text-foreground">Claw Mind</h1>
             </div>
 
             {/* Desktop Navigation */}
@@ -39,8 +40,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
                   href={item.href}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                     isActive(item.href)
-                      ? "bg-blue-50 text-blue-600"
-                      : "text-gray-600 hover:bg-gray-50"
+                      ? "bg-blue-500/10 text-blue-600 dark:text-blue-500"
+                      : "text-muted-foreground hover:bg-muted"
                   }`}
                 >
                   <item.icon className="w-5 h-5" />
@@ -48,6 +49,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 </Link>
               ))}
             </nav>
+
+            {/* Theme Selector */}
+            <div className="ml-4 flex items-center">
+              <ThemeSelector />
+            </div>
           </div>
         </div>
       </header>
@@ -56,14 +62,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <main className="flex-1">{children}</main>
 
       {/* Mobile Navigation */}
-      <nav className="md:hidden bg-white border-t border-gray-200 fixed bottom-0 left-0 right-0 z-10">
+      <nav className="md:hidden bg-card border-t border-border fixed bottom-0 left-0 right-0 z-10">
         <div className="grid grid-cols-5 gap-1 p-2">
           {navItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               className={`flex flex-col items-center gap-1 py-2 px-1 rounded-lg transition-colors ${
-                isActive(item.href) ? "bg-blue-50 text-blue-600" : "text-gray-600"
+                isActive(item.href) ? "bg-blue-500/10 text-blue-600 dark:text-blue-500" : "text-muted-foreground hover:bg-muted"
               }`}
             >
               <item.icon className="w-5 h-5" />

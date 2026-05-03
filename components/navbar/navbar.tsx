@@ -11,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { ToggleColorTheme } from "./toggle-color-theme";
 import { ToggleTheme } from "./toggle-theme";
 import { authClient } from "@/lib/auth-client";
 import {
@@ -111,7 +112,10 @@ export function NavBar() {
 
       {/* Right - Auth */}
       <div className="flex items-center justify-end gap-3">
-        <ToggleTheme />
+        <div className="flex items-center gap-2">
+          <ToggleTheme />
+          <ToggleColorTheme />
+        </div>
 
         {isPending ? (
           <LoaderIcon className="size-4 animate-spin text-muted-foreground" />

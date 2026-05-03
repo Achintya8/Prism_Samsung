@@ -33,8 +33,8 @@ export function Activities() {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Activities</h1>
-          <p className="text-sm text-gray-500 mt-1">Track your daily progress</p>
+          <h1 className="text-2xl font-semibold text-foreground">Activities</h1>
+          <p className="text-sm text-muted-foreground mt-1">Track your daily progress</p>
         </div>
         <button
           onClick={() => setShowAddForm(!showAddForm)}
@@ -47,11 +47,11 @@ export function Activities() {
 
       {/* Add Activity Form */}
       {showAddForm && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Log Extracurricular Activity</h2>
+        <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border p-6 mb-6">
+          <h2 className="text-lg font-semibold text-foreground mb-4">Log Extracurricular Activity</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Select Activity
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -65,8 +65,8 @@ export function Activities() {
                     }}
                     className={`p-3 rounded-lg border-2 text-sm transition-colors ${
                       selectedCategory === category && !isOther
-                        ? "border-blue-600 bg-blue-50 text-blue-700"
-                        : "border-gray-200 hover:border-gray-300 text-gray-700"
+                        ? "border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-500"
+                        : "border-input hover:border-border text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {category}
@@ -80,8 +80,8 @@ export function Activities() {
                   }}
                   className={`p-3 rounded-lg border-2 text-sm transition-colors ${
                     isOther
-                      ? "border-blue-600 bg-blue-50 text-blue-700"
-                      : "border-gray-200 hover:border-gray-300 text-gray-700"
+                      ? "border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-500"
+                      : "border-input hover:border-border text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   Other
@@ -91,7 +91,7 @@ export function Activities() {
 
             {isOther && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Activity Name
                 </label>
                 <input
@@ -99,7 +99,7 @@ export function Activities() {
                   value={customActivity}
                   onChange={(e) => setCustomActivity(e.target.value)}
                   placeholder="e.g., Badminton, Dance, etc."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-input bg-transparent rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   required
                 />
               </div>
@@ -108,7 +108,7 @@ export function Activities() {
             <button
               type="submit"
               disabled={!selectedCategory && !customActivity.trim()}
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition-colors"
             >
               Log Activity
             </button>
@@ -117,15 +117,15 @@ export function Activities() {
       )}
 
       {/* Connected Platforms */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Connected Platforms</h2>
+      <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border p-6 mb-6">
+        <h2 className="text-lg font-semibold text-foreground mb-4">Connected Platforms</h2>
         <div className="space-y-3">
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
             <div className="flex items-center gap-3">
-              <GithubIcon className="w-6 h-6 text-gray-700" />
+              <GithubIcon className="w-6 h-6 text-muted-foreground" />
               <div>
-                <p className="font-medium text-gray-900">GitHub</p>
-                <p className="text-sm text-gray-500">Auto-sync contributions</p>
+                <p className="font-medium text-foreground">GitHub</p>
+                <p className="text-sm text-muted-foreground">Auto-sync contributions</p>
               </div>
             </div>
             <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
@@ -133,12 +133,12 @@ export function Activities() {
             </span>
           </div>
 
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
             <div className="flex items-center gap-3">
-              <Code2 className="w-6 h-6 text-gray-700" />
+              <Code2 className="w-6 h-6 text-muted-foreground" />
               <div>
-                <p className="font-medium text-gray-900">LeetCode</p>
-                <p className="text-sm text-gray-500">Auto-sync solved problems</p>
+                <p className="font-medium text-foreground">LeetCode</p>
+                <p className="text-sm text-muted-foreground">Auto-sync solved problems</p>
               </div>
             </div>
             <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
@@ -149,8 +149,8 @@ export function Activities() {
       </div>
 
       {/* Activity History */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Activity History</h2>
+      <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border p-6">
+        <h2 className="text-lg font-semibold text-foreground mb-4">Activity History</h2>
         <div className="space-y-3">
           {recentActivities.map((activity) => (
             <ActivityCard key={activity.id} activity={activity} />

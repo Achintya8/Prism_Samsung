@@ -2,11 +2,11 @@ import { heatmapData } from "./data/mockData";
 
 export function ActivityHeatmap() {
   const getColor = (count: number) => {
-    if (count === 0) return "bg-gray-100";
-    if (count <= 2) return "bg-green-200";
-    if (count <= 4) return "bg-green-400";
-    if (count <= 6) return "bg-green-600";
-    return "bg-green-700";
+    if (count === 0) return "bg-muted";
+    if (count <= 2) return "bg-emerald-500/35 dark:bg-emerald-400/30";
+    if (count <= 4) return "bg-emerald-500/55 dark:bg-emerald-500/45";
+    if (count <= 6) return "bg-emerald-600 dark:bg-emerald-500";
+    return "bg-emerald-700 dark:bg-emerald-600";
   };
 
   // Group data by weeks
@@ -32,8 +32,8 @@ export function ActivityHeatmap() {
   });
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6 overflow-x-auto">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">Activity Heatmap</h2>
+    <div className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm ring-1 ring-foreground/10 mb-6 overflow-x-auto">
+      <h2 className="text-lg font-semibold text-foreground mb-4">Activity Heatmap</h2>
 
       <div className="min-w-max">
         {/* Month labels */}
@@ -42,7 +42,7 @@ export function ActivityHeatmap() {
             <div
               key={position}
               style={{ marginLeft: position * 12 }}
-              className="text-xs text-gray-500"
+              className="text-xs text-muted-foreground"
             >
               {month}
             </div>
@@ -54,21 +54,21 @@ export function ActivityHeatmap() {
           {/* Day labels */}
           <div className="flex flex-col gap-[2px] mr-2">
             <div className="h-[10px]"></div>
-            <div className="h-[10px] text-xs text-gray-500 flex items-center">Mon</div>
+            <div className="h-[10px] text-xs text-muted-foreground flex items-center">Mon</div>
             <div className="h-[10px]"></div>
-            <div className="h-[10px] text-xs text-gray-500 flex items-center">Wed</div>
+            <div className="h-[10px] text-xs text-muted-foreground flex items-center">Wed</div>
             <div className="h-[10px]"></div>
-            <div className="h-[10px] text-xs text-gray-500 flex items-center">Fri</div>
+            <div className="h-[10px] text-xs text-muted-foreground flex items-center">Fri</div>
             <div className="h-[10px]"></div>
           </div>
 
           {/* Weeks */}
           {weeks.slice(-52).map((week, weekIndex) => (
             <div key={weekIndex} className="flex flex-col gap-[2px]">
-              {week.map((day, dayIndex) => (
+              {week.map((day) => (
                 <div
                   key={day.date}
-                  className={`w-[10px] h-[10px] rounded-sm ${getColor(day.count)} hover:ring-2 hover:ring-gray-400 cursor-pointer transition-all`}
+                  className={`w-[10px] h-[10px] rounded-sm ${getColor(day.count)} hover:ring-2 hover:ring-ring cursor-pointer transition-all`}
                   title={`${day.date}: ${day.count} activities`}
                 />
               ))}
@@ -77,14 +77,14 @@ export function ActivityHeatmap() {
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-2 mt-4 text-xs text-gray-500">
+        <div className="flex items-center gap-2 mt-4 text-xs text-muted-foreground">
           <span>Less</span>
           <div className="flex gap-1">
-            <div className="w-3 h-3 rounded-sm bg-gray-100"></div>
-            <div className="w-3 h-3 rounded-sm bg-green-200"></div>
-            <div className="w-3 h-3 rounded-sm bg-green-400"></div>
-            <div className="w-3 h-3 rounded-sm bg-green-600"></div>
-            <div className="w-3 h-3 rounded-sm bg-green-700"></div>
+            <div className="w-3 h-3 rounded-sm bg-muted"></div>
+            <div className="w-3 h-3 rounded-sm bg-emerald-500/35 dark:bg-emerald-400/30"></div>
+            <div className="w-3 h-3 rounded-sm bg-emerald-500/55 dark:bg-emerald-500/45"></div>
+            <div className="w-3 h-3 rounded-sm bg-emerald-600 dark:bg-emerald-500"></div>
+            <div className="w-3 h-3 rounded-sm bg-emerald-700 dark:bg-emerald-600"></div>
           </div>
           <span>More</span>
         </div>
