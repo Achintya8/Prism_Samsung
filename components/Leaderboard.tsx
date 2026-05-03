@@ -4,7 +4,7 @@ import { leaderboardData } from "./data/mockData";
 export function Leaderboard() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border overflow-hidden">
         {/* Header */}
         <div className="bg-linear-to-r from-blue-600 to-purple-600 p-6 text-white">
           <div className="flex items-center gap-3 mb-2">
@@ -15,22 +15,22 @@ export function Leaderboard() {
         </div>
 
         {/* Top 3 Podium */}
-        <div className="p-6 bg-linear-to-b from-gray-50 to-white">
+        <div className="p-6 bg-linear-to-b from-muted/50 to-card">
           <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto">
             {/* 2nd Place */}
             <div className="flex flex-col items-center pt-8">
               <div className="relative">
-                <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center text-xl font-semibold text-gray-700">
+                <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center text-xl font-semibold text-foreground">
                   {leaderboardData[1].avatar}
                 </div>
-                <div className="absolute -top-2 -right-2 w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                  <span className="text-sm font-semibold text-gray-700">2</span>
+                <div className="absolute -top-2 -right-2 w-8 h-8 bg-secondary rounded-full flex items-center justify-center">
+                  <span className="text-sm font-semibold text-secondary-foreground">2</span>
                 </div>
               </div>
-              <p className="mt-2 font-semibold text-gray-900 text-sm text-center">
+              <p className="mt-2 font-semibold text-foreground text-sm text-center">
                 {leaderboardData[1].name}
               </p>
-              <p className="text-xs text-gray-500">{leaderboardData[1].points} pts</p>
+              <p className="text-xs text-muted-foreground">{leaderboardData[1].points} pts</p>
             </div>
 
             {/* 1st Place */}
@@ -43,10 +43,10 @@ export function Leaderboard() {
                   <Trophy className="w-5 h-5 text-yellow-900" />
                 </div>
               </div>
-              <p className="mt-2 font-semibold text-gray-900 text-center">
+              <p className="mt-2 font-semibold text-foreground text-center">
                 {leaderboardData[0].name}
               </p>
-              <p className="text-sm text-gray-500">{leaderboardData[0].points} pts</p>
+              <p className="text-sm text-muted-foreground">{leaderboardData[0].points} pts</p>
             </div>
 
             {/* 3rd Place */}
@@ -59,21 +59,21 @@ export function Leaderboard() {
                   <span className="text-sm font-semibold text-orange-700">3</span>
                 </div>
               </div>
-              <p className="mt-2 font-semibold text-gray-900 text-sm text-center">
+              <p className="mt-2 font-semibold text-foreground text-sm text-center">
                 {leaderboardData[2].name}
               </p>
-              <p className="text-xs text-gray-500">{leaderboardData[2].points} pts</p>
+              <p className="text-xs text-muted-foreground">{leaderboardData[2].points} pts</p>
             </div>
           </div>
         </div>
 
         {/* Full Leaderboard */}
-        <div className="divide-y divide-gray-200">
+        <div className="divide-y divide-border">
           {leaderboardData.map((entry) => (
             <div
               key={entry.rank}
-              className={`flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors ${
-                entry.name === "You" ? "bg-blue-50 hover:bg-blue-100" : ""
+              className={`flex items-center gap-4 p-4 hover:bg-muted/50 transition-colors ${
+                entry.name === "You" ? "bg-blue-500/10 hover:bg-blue-500/20" : ""
               }`}
             >
               {/* Rank */}
@@ -89,14 +89,14 @@ export function Leaderboard() {
                     }`}
                   />
                 ) : (
-                  <span className="text-gray-500 font-medium">#{entry.rank}</span>
+                  <span className="text-muted-foreground font-medium">#{entry.rank}</span>
                 )}
               </div>
 
               {/* Avatar */}
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-                  entry.name === "You" ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"
+                  entry.name === "You" ? "bg-blue-600 text-white" : "bg-muted text-muted-foreground"
                 }`}
               >
                 {entry.avatar}
@@ -104,24 +104,24 @@ export function Leaderboard() {
 
               {/* User Info */}
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-900 truncate">
+                <p className="font-semibold text-foreground truncate">
                   {entry.name}
                   {entry.name === "You" && (
-                    <span className="ml-2 text-xs font-normal text-blue-600">(You)</span>
+                    <span className="ml-2 text-xs font-normal text-blue-500">(You)</span>
                   )}
                 </p>
-                <p className="text-sm text-gray-500 truncate">{entry.department}</p>
+                <p className="text-sm text-muted-foreground truncate">{entry.department}</p>
               </div>
 
               {/* Stats */}
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1">
                   <Flame className="w-4 h-4 text-orange-500" />
-                  <span className="text-sm font-medium text-gray-700">{entry.streak}</span>
+                  <span className="text-sm font-medium text-foreground">{entry.streak}</span>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-gray-900">{entry.points}</p>
-                  <p className="text-xs text-gray-500">points</p>
+                  <p className="font-semibold text-foreground">{entry.points}</p>
+                  <p className="text-xs text-muted-foreground">points</p>
                 </div>
               </div>
             </div>
