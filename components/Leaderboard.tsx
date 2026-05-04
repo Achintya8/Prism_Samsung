@@ -61,18 +61,18 @@ function PodiumEntry({ entry, place }: { entry: LeaderboardEntry; place: 'first'
     <div className={`flex flex-col items-center ${isFirst ? 'sm:-mt-4' : 'sm:pt-8'}`}>
       <div className="relative">
         <div
-          className={`${isFirst ? 'w-20 h-20 bg-amber-300 text-amber-950' : 'w-16 h-16 bg-slate-100 text-slate-700'} rounded-full flex items-center justify-center text-lg font-semibold ring-4 ring-white shadow-sm`}
+          className={`${isFirst ? 'w-20 h-20 bg-amber-300 text-amber-950' : 'w-16 h-16 bg-muted text-muted-foreground'} rounded-full flex items-center justify-center text-lg font-semibold ring-4 ring-background shadow-sm`}
         >
           {entry.avatar}
         </div>
-        <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-white px-2 py-0.5 text-xs font-semibold text-slate-700 shadow-sm ring-1 ring-slate-200">
+        <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 rounded-full bg-card px-2 py-0.5 text-xs font-semibold text-foreground shadow-sm ring-1 ring-border">
           #{entry.rank}
         </div>
       </div>
-      <div className={`${isFirst ? 'mt-6 text-lg' : 'mt-5 text-sm'} max-w-36 truncate font-medium text-slate-900`}>
+      <div className={`${isFirst ? 'mt-6 text-lg' : 'mt-5 text-sm'} max-w-36 truncate font-medium text-foreground`}>
         {entry.isCurrentUser ? 'You' : entry.name}
       </div>
-      <div className="text-xs text-slate-500">{entry.department || `${entry.currentStreak} day streak`}</div>
+      <div className="text-xs text-muted-foreground">{entry.department || `${entry.currentStreak} day streak`}</div>
       <div className={`${isFirst ? 'text-lg' : ''} mt-2 font-semibold text-blue-600`}>{entry.totalPoints} pts</div>
     </div>
   )
@@ -144,7 +144,7 @@ export function Leaderboard() {
   ].filter((item) => item.entry)
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
+    <div id="tour-leaderboard" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
       <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border overflow-hidden">
         {/* Header */}
         <div className="bg-linear-to-r from-blue-600 to-purple-600 p-6 text-white">
@@ -167,7 +167,7 @@ export function Leaderboard() {
 
         {/* Your Rank Section */}
         {userEntry && (
-          <div className="bg-blue-50 border-b border-blue-200 p-4 sm:p-6">
+          <div className="bg-blue-50 dark:bg-blue-950/40 border-b border-blue-200 dark:border-blue-900 p-4 sm:p-6">
             <p className="text-xs text-blue-600 font-semibold uppercase tracking-wider mb-3">Your Rank</p>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
@@ -175,20 +175,20 @@ export function Leaderboard() {
                   {userEntry.avatar}
                 </div>
                 <div>
-                  <p className="font-semibold text-gray-900">{userEntry.name}</p>
-                  <p className="text-sm text-gray-600">#{userEntry.rank} • {userEntry.currentStreak} day streak</p>
+                  <p className="font-semibold text-foreground">{userEntry.name}</p>
+                  <p className="text-sm text-muted-foreground">#{userEntry.rank} • {userEntry.currentStreak} day streak</p>
                 </div>
               </div>
               <div className="text-right">
                 <p className="text-2xl font-bold text-blue-600">{userEntry.totalPoints}</p>
-                <p className="text-xs text-gray-500">points</p>
+                <p className="text-xs text-muted-foreground">points</p>
               </div>
             </div>
           </div>
         )}
 
         {/* Top 3 Podium */}
-        <div className="p-6 bg-gradient-to-b from-gray-50 to-white">
+        <div className="p-6 bg-gradient-to-b from-muted/50 to-card">
           {entries.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto">
               {podiumEntries.map(({ entry, place, className }) => (
@@ -198,25 +198,25 @@ export function Leaderboard() {
               ))}
             </div>
           ) : (
-            <div className="max-w-2xl mx-auto rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center">
+            <div className="max-w-2xl mx-auto rounded-lg border border-dashed border-border bg-card p-8 text-center">
               <Medal className="mx-auto mb-3 h-8 w-8 text-slate-400" />
-              <p className="font-medium text-slate-900">No rankings yet</p>
-              <p className="mt-1 text-sm text-slate-500">Earn your first points to claim #1.</p>
+              <p className="font-medium text-foreground">No rankings yet</p>
+              <p className="mt-1 text-sm text-muted-foreground">Earn your first points to claim #1.</p>
             </div>
           )}
 
           {/* Remaining list */}
           <div className="mt-6 max-w-2xl mx-auto space-y-2">
             {entries.slice(3).map((entry) => (
-              <div key={entry.userId ?? entry.rank} className="flex items-center justify-between border border-slate-200 p-3 rounded-lg bg-white">
+              <div key={entry.userId ?? entry.rank} className="flex items-center justify-between border border-border p-3 rounded-lg bg-card">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-xs font-semibold text-slate-600">{entry.avatar}</div>
+                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-semibold text-muted-foreground">{entry.avatar}</div>
                   <div>
-                    <div className="font-medium text-slate-900">{entry.isCurrentUser ? 'You' : entry.name}</div>
-                    <div className="text-xs text-slate-500">#{entry.rank} - {entry.department || `${entry.currentStreak} day streak`}</div>
+                    <div className="font-medium text-foreground">{entry.isCurrentUser ? 'You' : entry.name}</div>
+                    <div className="text-xs text-muted-foreground">#{entry.rank} - {entry.department || `${entry.currentStreak} day streak`}</div>
                   </div>
                 </div>
-                <div className="text-sm font-semibold text-gray-700">{entry.totalPoints} pts</div>
+                <div className="text-sm font-semibold text-foreground/80">{entry.totalPoints} pts</div>
               </div>
             ))}
           </div>

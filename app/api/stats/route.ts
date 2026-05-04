@@ -33,6 +33,8 @@ export async function GET(request: Request) {
         currentStreak: user.currentStreak,
         longestStreak: user.longestStreak,
         rank: higherRankedUsers + 1,
+        githubUsername: user.githubUsername,
+        leetcodeUsername: user.leetcodeUsername,
         githubContributions: user.githubContributions,
         githubPublicRepos: user.githubPublicRepos ?? 0,
         githubFollowers: user.githubFollowers ?? 0,

@@ -190,11 +190,12 @@ export function Activities() {
     <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 pb-20 md:pb-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <div>
-          <h1 className="text-xl sm:text-2xl font-semibold text-gray-900">Activities</h1>
-          <p className="text-xs sm:text-sm text-gray-500 mt-1">Track your daily progress</p>
-          {status && <p className="text-xs sm:text-sm text-gray-600 mt-2">{status}</p>}
+          <h1 className="text-xl sm:text-2xl font-semibold text-foreground">Activities</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-1">Track your daily progress</p>
+          {status && <p className="text-xs sm:text-sm text-muted-foreground mt-2">{status}</p>}
         </div>
         <button
+          id="tour-activities-add"
           onClick={() => setShowAddForm(!showAddForm)}
           className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base w-full sm:w-auto"
         >
@@ -205,11 +206,11 @@ export function Activities() {
       </div>
 
       {showAddForm && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
-          <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Log Activity</h2>
+        <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 mb-6">
+          <h2 className="text-base sm:text-lg font-semibold text-foreground mb-4">Log Activity</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Select Activity</label>
+              <label className="block text-xs sm:text-sm font-medium text-foreground/80 mb-2">Select Activity</label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {activityOptions.map((option) => (
                   <button
@@ -217,8 +218,8 @@ export function Activities() {
                     type="button"
                     onClick={() => chooseOption(option)}
                     className={`p-2 sm:p-3 rounded-lg border-2 text-xs sm:text-sm transition-colors ${selectedOption.label === option.label
-                      ? 'border-blue-600 bg-blue-50 text-blue-700'
-                      : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                      ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                      : 'border-border hover:border-muted-foreground/50 text-foreground/80'
                     }`}
                   >
                     {option.label}
@@ -229,39 +230,39 @@ export function Activities() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <label className="block">
-                <span className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Title</span>
+                <span className="block text-xs sm:text-sm font-medium text-foreground/80 mb-2">Title</span>
                 <input
                   type="text"
                   value={customTitle}
                   onChange={(event) => setCustomTitle(event.target.value)}
                   placeholder={selectedOption.label}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </label>
               <label className="block">
-                <span className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Value</span>
+                <span className="block text-xs sm:text-sm font-medium text-foreground/80 mb-2">Value</span>
                 <div className="flex">
                   <input
                     type="number"
                     min="1"
                     value={value}
                     onChange={(event) => setValue(event.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-gray-300 rounded-l-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 text-sm border border-border rounded-l-lg bg-background text-foreground focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     required
                   />
-                  <span className="px-2 sm:px-3 py-2 border border-l-0 border-gray-300 rounded-r-lg bg-gray-50 text-xs sm:text-sm text-gray-500 whitespace-nowrap">{selectedOption.unit}</span>
+                  <span className="px-2 sm:px-3 py-2 border border-l-0 border-border rounded-r-lg bg-muted text-xs sm:text-sm text-muted-foreground whitespace-nowrap">{selectedOption.unit}</span>
                 </div>
               </label>
             </div>
 
             <label className="block">
-              <span className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Details</span>
+              <span className="block text-xs sm:text-sm font-medium text-foreground/80 mb-2">Details</span>
               <input
                 type="text"
                 value={details}
                 onChange={(event) => setDetails(event.target.value)}
                 placeholder="Optional details"
-                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </label>
 
@@ -276,13 +277,13 @@ export function Activities() {
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6 mb-6">
+      <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-          <h2 className="text-base sm:text-lg font-semibold text-gray-900">Connected Platforms</h2>
+          <h2 className="text-base sm:text-lg font-semibold text-foreground">Connected Platforms</h2>
           <button
             onClick={syncPlatforms}
             disabled={syncing}
-            className="inline-flex items-center justify-center gap-2 px-3 py-2 border border-gray-300 text-gray-700 text-sm rounded-lg hover:bg-gray-50 disabled:opacity-50 w-full sm:w-auto"
+            className="inline-flex items-center justify-center gap-2 px-3 py-2 border border-border text-foreground/80 text-sm rounded-lg hover:bg-muted disabled:opacity-50 w-full sm:w-auto"
           >
             <RefreshCcw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
             Sync
@@ -293,11 +294,11 @@ export function Activities() {
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <GithubIcon className="w-5 sm:w-6 h-5 sm:h-6 text-muted-foreground flex-shrink-0" />
               <div className="min-w-0">
-                <p className="text-sm sm:text-base font-medium text-gray-900">GitHub</p>
-                <p className="text-xs sm:text-sm text-gray-500 truncate">{githubConnected ? `${profile.githubUsername}` : 'Add username in Profile'}</p>
+                <p className="text-sm sm:text-base font-medium text-foreground">GitHub</p>
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">{githubConnected ? `${profile.githubUsername}` : 'Add username in Profile'}</p>
               </div>
             </div>
-            <span className={`px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded-full whitespace-nowrap flex-shrink-0 ${githubConnected ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>
+            <span className={`px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded-full whitespace-nowrap flex-shrink-0 ${githubConnected ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-muted text-muted-foreground'}`}>
               {githubConnected ? 'Connected' : 'Not set'}
             </span>
           </div>
@@ -306,26 +307,26 @@ export function Activities() {
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <Code2 className="w-5 sm:w-6 h-5 sm:h-6 text-muted-foreground flex-shrink-0" />
               <div className="min-w-0">
-                <p className="text-sm sm:text-base font-medium text-gray-900">LeetCode</p>
-                <p className="text-xs sm:text-sm text-gray-500 truncate">{leetcodeConnected ? `${profile.leetcodeUsername}` : 'Add username in Profile'}</p>
+                <p className="text-sm sm:text-base font-medium text-foreground">LeetCode</p>
+                <p className="text-xs sm:text-sm text-muted-foreground truncate">{leetcodeConnected ? `${profile.leetcodeUsername}` : 'Add username in Profile'}</p>
               </div>
             </div>
-            <span className={`px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded-full whitespace-nowrap flex-shrink-0 ${leetcodeConnected ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>
+            <span className={`px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded-full whitespace-nowrap flex-shrink-0 ${leetcodeConnected ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-muted text-muted-foreground'}`}>
               {leetcodeConnected ? 'Connected' : 'Not set'}
             </span>
           </div>
         </div>
-        {profile.lastPlatformSyncAt && <p className="text-[11px] sm:text-xs text-gray-400 mt-3">Last synced {new Date(profile.lastPlatformSyncAt).toLocaleString()}</p>}
+        {profile.lastPlatformSyncAt && <p className="text-[11px] sm:text-xs text-muted-foreground mt-3">Last synced {new Date(profile.lastPlatformSyncAt).toLocaleString()}</p>}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-        <h2 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Activity History</h2>
+      <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6">
+        <h2 className="text-base sm:text-lg font-semibold text-foreground mb-4">Activity History</h2>
         <div className="space-y-3">
           {activities.map((activity) => (
             <ActivityCard key={activity.id} activity={activity} />
           ))}
           {activities.length === 0 && (
-            <div className="rounded-lg border border-dashed border-gray-300 p-6 text-center text-sm text-gray-500">
+            <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
               No activity logged yet. Add an activity or sync a connected platform.
             </div>
           )}

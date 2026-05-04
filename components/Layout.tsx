@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Trophy, Activity, User, MessageCircle } from "lucide-react";
 import { ThemeSelector } from "./ThemeSelector";
+import { OnboardingTour } from "./OnboardingTour";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -38,6 +39,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                 <Link
                   key={item.href}
                   href={item.href}
+                  id={`tour-nav-${item.label.toLowerCase()}`}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                     isActive(item.href)
                       ? "bg-blue-500/10 text-blue-600 dark:text-blue-500"
@@ -61,6 +63,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
       {/* Main Content */}
       <main className="flex-1">{children}</main>
 
+      <OnboardingTour />
+
       {/* Mobile Navigation */}
       <nav className="md:hidden bg-card border-t border-border fixed bottom-0 left-0 right-0 z-10">
         <div className="grid grid-cols-5 gap-1 p-2">
@@ -68,6 +72,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Link
               key={item.href}
               href={item.href}
+              id={`tour-mobile-nav-${item.label.toLowerCase()}`}
               className={`flex flex-col items-center gap-1 py-2 px-1 rounded-lg transition-colors ${
                 isActive(item.href) ? "bg-blue-500/10 text-blue-600 dark:text-blue-500" : "text-muted-foreground hover:bg-muted"
               }`}

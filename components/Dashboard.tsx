@@ -13,8 +13,9 @@ import {
 } from "lucide-react";
 import { GithubIcon } from "./icons/GithubIcon";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { ActivityHeatmap } from "./ActivityHeatmap";
-import { StreakDisplay } from "./StreakDisplay";
+const StreakDisplay = dynamic(() => import('./StreakDisplay').then(m => ({ default: m.StreakDisplay })), { ssr: false })
 import { ActivityCard } from "./ActivityCard";
 import { Leaderboard } from './Leaderboard'
 import { ClawMind } from './ClawMind'
@@ -32,6 +33,8 @@ export function Dashboard() {
     leetcodeSolved: 0,
     gymSessions: 0,
     joggingDistance: 0,
+    githubUsername: '',
+    leetcodeUsername: '',
   })
   const [activities, setActivities] = useState<any[]>([])
 
@@ -55,7 +58,7 @@ export function Dashboard() {
             setActivities(json.activities.slice(0, 5))
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     }
     load()
   }, [])
@@ -83,15 +86,15 @@ export function Dashboard() {
       </Link>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
+      <div id="tour-dashboard-stats" className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
         <div className={statSurface}>
           <div className="flex items-center gap-2 mb-2">
             <div className="p-1.5 sm:p-2 rounded-lg bg-blue-500/15 text-blue-600 dark:bg-blue-500/25 dark:text-blue-400 flex-shrink-0">
               <TrendingUp className="w-4 sm:w-5 h-4 sm:h-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] sm:text-sm text-gray-500">Total Points</p>
-              <p className="text-lg sm:text-2xl font-semibold text-gray-900">{stats.totalPoints}</p>
+              <p className="text-[10px] sm:text-sm text-muted-foreground">Total Points</p>
+              <p className="text-lg sm:text-2xl font-semibold text-foreground">{stats.totalPoints}</p>
             </div>
           </div>
         </div>
@@ -99,11 +102,11 @@ export function Dashboard() {
         <div className={statSurface}>
           <div className="flex items-center gap-2 mb-2">
             <div className="p-1.5 sm:p-2 rounded-lg bg-orange-500/15 text-orange-600 dark:bg-orange-500/25 dark:text-orange-400 flex-shrink-0">
-              <Flame className="w-4 sm:w-5 h-4 sm:h-5" />
+              <img src="/fire.png?v=2" alt="Fire" className="w-5 sm:w-6 h-5 sm:h-6 object-contain drop-shadow-md" />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] sm:text-sm text-gray-500">Current Streak</p>
-              <p className="text-lg sm:text-2xl font-semibold text-gray-900">{stats.currentStreak}</p>
+              <p className="text-[10px] sm:text-sm text-muted-foreground">Current Streak</p>
+              <p className="text-lg sm:text-2xl font-semibold text-foreground">{stats.currentStreak}</p>
             </div>
           </div>
         </div>
@@ -114,8 +117,8 @@ export function Dashboard() {
               <Trophy className="w-4 sm:w-5 h-4 sm:h-5" />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] sm:text-sm text-gray-500">College Rank</p>
-              <p className="text-lg sm:text-2xl font-semibold text-gray-900">#{stats.rank}</p>
+              <p className="text-[10px] sm:text-sm text-muted-foreground">Global Rank</p>
+              <p className="text-lg sm:text-2xl font-semibold text-foreground">#{stats.rank}</p>
             </div>
           </div>
         </div>
@@ -123,62 +126,62 @@ export function Dashboard() {
         <div className={statSurface}>
           <div className="flex items-center gap-2 mb-2">
             <div className="p-1.5 sm:p-2 rounded-lg bg-green-500/15 text-green-600 dark:bg-green-500/25 dark:text-green-400 flex-shrink-0">
-              <Flame className="w-4 sm:w-5 h-4 sm:h-5" />
+              <img src="/fire.png?v=2" alt="Fire" className="w-5 sm:w-6 h-5 sm:h-6 object-contain drop-shadow-md" />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] sm:text-sm text-gray-500">Best Streak</p>
-              <p className="text-lg sm:text-2xl font-semibold text-gray-900">{stats.longestStreak}</p>
+              <p className="text-[10px] sm:text-sm text-muted-foreground">Best Streak</p>
+              <p className="text-lg sm:text-2xl font-semibold text-foreground">{stats.longestStreak}</p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Platform Stats
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className={statSurface}>
-          <div className="flex items-center gap-2 mb-1">
-            <GithubIcon className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">GitHub</span>
-          </div>
-          <p className="text-xl font-semibold text-gray-900">{stats.githubContributions}</p>
-          <p className="text-xs text-gray-500">contributions</p>
-        </div>
+      {/* Frequent Activities */}
+      {(() => {
+        const freqStats = [
+          { id: 'github', label: 'GitHub', value: stats.githubContributions, unit: 'commits', icon: GithubIcon, colorClass: 'text-gray-700 dark:text-gray-300', url: stats.githubUsername ? `https://github.com/${stats.githubUsername}` : null },
+          { id: 'leetcode', label: 'LeetCode', value: stats.leetcodeSolved, unit: 'problems', icon: Code2, colorClass: 'text-yellow-600 dark:text-yellow-500', url: stats.leetcodeUsername ? `https://leetcode.com/u/${stats.leetcodeUsername}` : null },
+          { id: 'gym', label: 'Gym', value: stats.gymSessions, unit: 'sessions', icon: Dumbbell, colorClass: 'text-blue-600 dark:text-blue-500', url: null },
+          { id: 'jogging', label: 'Jogging', value: stats.joggingDistance, unit: 'km', icon: Footprints, colorClass: 'text-green-600 dark:text-green-500', url: null }
+        ].filter(s => s.value > 0).sort((a, b) => b.value - a.value);
 
-        <div className={statSurface}>
-          <div className="flex items-center gap-2 mb-1">
-            <Code2 className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">LeetCode</span>
-          </div>
-          <p className="text-xl font-semibold text-gray-900">{stats.leetcodeSolved}</p>
-          <p className="text-xs text-gray-500">problems solved</p>
-        </div>
+        if (freqStats.length === 0) return null;
 
-        <div className={statSurface}>
-          <div className="flex items-center gap-2 mb-1">
-            <Dumbbell className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">Gym</span>
-          </div>
-          <p className="text-xl font-semibold text-gray-900">{stats.gymSessions}</p>
-          <p className="text-xs text-gray-500">sessions</p>
-        </div>
+        return (
+          <div className="mb-4 sm:mb-6">
+            <h3 className="text-sm font-medium text-muted-foreground mb-3 px-1">Frequent Activities</h3>
+            <div className="flex flex-wrap gap-3">
+              {freqStats.map((stat) => {
+                const Icon = stat.icon;
+                const Wrapper = stat.url ? 'a' : 'div';
+                const wrapperProps = stat.url ? { href: stat.url, target: '_blank', rel: 'noopener noreferrer' } : {};
 
-        <div className={statSurface}>
-          <div className="flex items-center gap-2 mb-1">
-            <Footprints className="w-4 h-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">Jogging</span>
+                return (
+                  <Wrapper
+                    key={stat.id}
+                    {...wrapperProps}
+                    className={`flex items-center gap-2.5 px-3.5 py-2 rounded-xl border border-border bg-card shadow-sm ring-1 ring-foreground/5 ${stat.url ? 'hover:bg-muted/50 cursor-pointer transition-colors' : ''}`}
+                  >
+                    <Icon className={`w-4 h-4 ${stat.colorClass}`} />
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="font-medium text-foreground text-sm">{stat.value}</span>
+                      <span className="text-xs text-muted-foreground">{stat.unit}</span>
+                    </div>
+                  </Wrapper>
+                )
+              })}
+            </div>
           </div>
-          <p className="text-xl font-semibold text-gray-900">{stats.joggingDistance}km</p>
-          <p className="text-xs text-gray-500">distance</p>
-        </div>
-      </div> */}
+        );
+      })()}
 
       {/* Streak Display */}
       {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6"> */}
-        <div className="lg:col-span-2">
-          <StreakDisplay />
-          <ActivityHeatmap />
-        </div>
-        {/* <div className="lg:col-span-1">
+      <div id="tour-streak-calendar" className="lg:col-span-2">
+        <StreakDisplay />
+        <ActivityHeatmap />
+      </div>
+      {/* <div className="lg:col-span-1">
           <Leaderboard />
           <ClawMind />
         </div> */}

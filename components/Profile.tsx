@@ -171,7 +171,7 @@ export function Profile() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 pb-20 md:pb-6">
-      <div className="bg-white rounded-xl p-6 border border-gray-200">
+      <div className="bg-card rounded-xl p-6 border border-border">
         <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
           <div className="w-20 h-20 rounded-full bg-blue-600 flex items-center justify-center text-2xl font-semibold text-white overflow-hidden">
             {profile.avatarUrl ? (
@@ -179,13 +179,14 @@ export function Profile() {
             ) : initials(profile.name)}
           </div>
           <div className="flex-1">
-            <h1 className="text-xl font-semibold text-gray-900">{profile.name || 'Your Profile'}</h1>
-            <p className="text-gray-500">{profile.email || 'Signed-in student'}</p>
+            <h1 className="text-xl font-semibold text-foreground">{profile.name || 'Your Profile'}</h1>
+            <p className="text-muted-foreground">{profile.email || 'Signed-in student'}</p>
             {profile.lastPlatformSyncAt && (
-              <p className="text-xs text-gray-400 mt-1">Last synced {new Date(profile.lastPlatformSyncAt).toLocaleString()}</p>
+              <p className="text-xs text-muted-foreground mt-1">Last synced {new Date(profile.lastPlatformSyncAt).toLocaleString()}</p>
             )}
           </div>
           <button
+            id="tour-profile-sync"
             onClick={syncPlatforms}
             disabled={syncing || saving}
             className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60"
@@ -196,153 +197,155 @@ export function Profile() {
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600">Points</p>
-            <p className="text-xl font-semibold text-gray-900">{profile.totalPoints}</p>
+          <div className="p-4 bg-muted rounded-lg">
+            <p className="text-sm text-muted-foreground">Points</p>
+            <p className="text-xl font-semibold text-foreground">{profile.totalPoints}</p>
           </div>
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600">Rank</p>
-            <p className="text-xl font-semibold text-gray-900">#{profile.rank || 1}</p>
+          <div className="p-4 bg-muted rounded-lg">
+            <p className="text-sm text-muted-foreground">Rank</p>
+            <p className="text-xl font-semibold text-foreground">#{profile.rank || 1}</p>
           </div>
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600">GitHub Repos</p>
-            <p className="text-xl font-semibold text-gray-900">{profile.githubPublicRepos}</p>
+          <div className="p-4 bg-muted rounded-lg">
+            <p className="text-sm text-muted-foreground">GitHub Repos</p>
+            <p className="text-xl font-semibold text-foreground">{profile.githubPublicRepos}</p>
           </div>
-          <div className="p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600">LeetCode</p>
-            <p className="text-xl font-semibold text-gray-900">{profile.leetcodeSolved}</p>
+          <div className="p-4 bg-muted rounded-lg">
+            <p className="text-sm text-muted-foreground">LeetCode</p>
+            <p className="text-xl font-semibold text-foreground">{profile.leetcodeSolved}</p>
           </div>
         </div>
 
-        <div className="grid sm:grid-cols-2 gap-4">
+        <div id="tour-profile-usernames" className="grid sm:grid-cols-2 gap-4">
           <label className="block">
-            <span className="text-sm text-gray-600">Display name</span>
+            <span className="text-sm text-muted-foreground">Display name</span>
             <input
               value={form.name}
               onChange={(event) => setForm((prev) => ({ ...prev, name: event.target.value }))}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="mt-1 w-full px-3 py-2 border border-border bg-background text-foreground rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </label>
           <label className="block">
-            <span className="text-sm text-gray-600">GitHub username</span>
-            <div className="mt-1 flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg">
-              <GithubIcon className="w-4 h-4 text-gray-500" />
+            <span className="text-sm text-muted-foreground">GitHub username</span>
+            <div className="mt-1 flex items-center gap-2 px-3 py-2 border border-border bg-background rounded-lg">
+              <GithubIcon className="w-4 h-4 text-muted-foreground" />
               <input
                 value={form.githubUsername}
                 onChange={(event) => setForm((prev) => ({ ...prev, githubUsername: event.target.value }))}
-                className="w-full outline-none"
+                className="w-full outline-none bg-transparent text-foreground"
                 placeholder="octocat"
               />
             </div>
           </label>
           <label className="block">
-            <span className="text-sm text-gray-600">LeetCode username</span>
+            <span className="text-sm text-muted-foreground">LeetCode username</span>
             <input
               value={form.leetcodeUsername}
               onChange={(event) => setForm((prev) => ({ ...prev, leetcodeUsername: event.target.value }))}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="mt-1 w-full px-3 py-2 border border-border bg-background text-foreground rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="leetcode_handle"
             />
           </label>
           <div className="grid grid-cols-4 gap-2">
-            <div className="p-3 bg-gray-50 rounded-lg">
-              <p className="text-xs text-gray-500">Followers</p>
-              <p className="font-semibold">{profile.githubFollowers}</p>
+            <div className="p-3 bg-muted rounded-lg">
+              <p className="text-xs text-muted-foreground">Followers</p>
+              <p className="font-semibold text-foreground">{profile.githubFollowers}</p>
             </div>
-            <div className="p-3 bg-gray-50 rounded-lg">
-              <p className="text-xs text-gray-500">Easy</p>
-              <p className="font-semibold">{profile.leetcodeEasySolved}</p>
+            <div className="p-3 bg-muted rounded-lg">
+              <p className="text-xs text-muted-foreground">Easy</p>
+              <p className="font-semibold text-foreground">{profile.leetcodeEasySolved}</p>
             </div>
-            <div className="p-3 bg-gray-50 rounded-lg">
-              <p className="text-xs text-gray-500">Medium</p>
-              <p className="font-semibold">{profile.leetcodeMediumSolved}</p>
+            <div className="p-3 bg-muted rounded-lg">
+              <p className="text-xs text-muted-foreground">Medium</p>
+              <p className="font-semibold text-foreground">{profile.leetcodeMediumSolved}</p>
             </div>
-            <div className="p-3 bg-gray-50 rounded-lg">
-              <p className="text-xs text-gray-500">Hard</p>
-              <p className="font-semibold">{profile.leetcodeHardSolved}</p>
+            <div className="p-3 bg-muted rounded-lg">
+              <p className="text-xs text-muted-foreground">Hard</p>
+              <p className="font-semibold text-foreground">{profile.leetcodeHardSolved}</p>
             </div>
           </div>
         </div>
 
-        {status && <p className="mt-4 text-sm text-gray-600">{status}</p>}
+        {status && <p className="mt-4 text-sm text-muted-foreground">{status}</p>}
 
         <button
           onClick={() => saveProfile()}
           disabled={saving}
-          className="mt-6 w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-60"
+          className="mt-6 w-full flex items-center justify-center gap-2 px-4 py-2 border border-border text-foreground rounded-lg hover:bg-muted disabled:opacity-60"
         >
           {saving ? <Settings className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Save Profile
         </button>
       </div>
 
-      <div className="bg-white rounded-xl p-6 border border-gray-200 mt-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">AI Provider Keys</h2>
-        <p className="text-sm text-gray-500 mb-6">Securely store your API keys to power the ClawMind study agent. Keys are encrypted in the database.</p>
+      <div id="tour-api-keys" className="bg-card rounded-xl p-6 border border-border mt-6">
+        <h2 className="text-xl font-semibold text-foreground mb-4">AI Provider Keys</h2>
+        <p className="text-sm text-muted-foreground mb-6">Securely store your API keys to power the ClawMind study agent. Keys are encrypted in the database.</p>
         
         <div className="grid sm:grid-cols-3 gap-4">
           <label className="block">
-            <span className="text-sm text-gray-600">OpenAI Key {hasKeys.hasOpenAI && <span className="text-green-500 font-medium">(Saved)</span>}</span>
+            <span className="text-sm text-muted-foreground">OpenAI Key {hasKeys.hasOpenAI && <span className="text-green-500 font-medium">(Saved)</span>}</span>
             <input
               type="password"
               value={keys.openaiKey}
               onChange={(event) => setKeys((prev) => ({ ...prev, openaiKey: event.target.value }))}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="mt-1 w-full px-3 py-2 border border-border bg-background text-foreground rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder={hasKeys.hasOpenAI ? "********" : "sk-..."}
             />
           </label>
           <label className="block">
-            <span className="text-sm text-gray-600">Anthropic Key {hasKeys.hasAnthropic && <span className="text-green-500 font-medium">(Saved)</span>}</span>
+            <span className="text-sm text-muted-foreground">Anthropic Key {hasKeys.hasAnthropic && <span className="text-green-500 font-medium">(Saved)</span>}</span>
             <input
               type="password"
               value={keys.anthropicKey}
               onChange={(event) => setKeys((prev) => ({ ...prev, anthropicKey: event.target.value }))}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="mt-1 w-full px-3 py-2 border border-border bg-background text-foreground rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder={hasKeys.hasAnthropic ? "********" : "sk-ant-..."}
             />
           </label>
           <label className="block">
-            <span className="text-sm text-gray-600">Gemini Key {hasKeys.hasGemini && <span className="text-green-500 font-medium">(Saved)</span>}</span>
+            <span className="text-sm text-muted-foreground">Gemini Key {hasKeys.hasGemini && <span className="text-green-500 font-medium">(Saved)</span>}</span>
             <input
               type="password"
               value={keys.geminiKey}
               onChange={(event) => setKeys((prev) => ({ ...prev, geminiKey: event.target.value }))}
-              className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="mt-1 w-full px-3 py-2 border border-border bg-background text-foreground rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder={hasKeys.hasGemini ? "********" : "AIza..."}
             />
           </label>
         </div>
 
-        <h3 className="text-lg font-semibold text-gray-900 mt-6 mb-3">GitHub Integration</h3>
-        <p className="text-sm text-gray-500 mb-4">Add a GitHub Personal Access Token (PAT) to fetch your full year of contribution history for accurate streaks.</p>
-        <label className="block max-w-md">
-          <span className="text-sm text-gray-600">GitHub PAT {hasKeys.hasGithubPat && <span className="text-green-500 font-medium">(Saved)</span>}</span>
-          <input
-            type="password"
-            value={keys.githubPat}
-            onChange={(event) => setKeys((prev) => ({ ...prev, githubPat: event.target.value }))}
-            className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder={hasKeys.hasGithubPat ? "********" : "ghp_..."}
-          />
-        </label>
+        <div id="tour-pats">
+          <h3 className="text-lg font-semibold text-foreground mt-6 mb-3">GitHub Integration</h3>
+          <p className="text-sm text-muted-foreground mb-4">Add a GitHub Personal Access Token (PAT) to fetch your full year of contribution history for accurate streaks.</p>
+          <label className="block max-w-md">
+            <span className="text-sm text-muted-foreground">GitHub PAT {hasKeys.hasGithubPat && <span className="text-green-500 font-medium">(Saved)</span>}</span>
+            <input
+              type="password"
+              value={keys.githubPat}
+              onChange={(event) => setKeys((prev) => ({ ...prev, githubPat: event.target.value }))}
+              className="mt-1 w-full px-3 py-2 border border-border bg-background text-foreground rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder={hasKeys.hasGithubPat ? "********" : "ghp_..."}
+            />
+          </label>
 
-        <label className="block max-w-md mt-4">
-          <span className="text-sm text-gray-600">LeetCode Session Token {hasKeys.hasLeetKey && <span className="text-green-500 font-medium">(Saved)</span>}</span>
-          <input
-            type="password"
-            value={keys.leetcodePat}
-            onChange={(event) => setKeys((prev) => ({ ...prev, leetcodePat: event.target.value }))}
-            className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder={hasKeys.hasLeetKey ? "********" : "session_..."}
-          />
-        </label>
+          <label className="block max-w-md mt-4">
+            <span className="text-sm text-muted-foreground">LeetCode Session Token {hasKeys.hasLeetKey && <span className="text-green-500 font-medium">(Saved)</span>}</span>
+            <input
+              type="password"
+              value={keys.leetcodePat}
+              onChange={(event) => setKeys((prev) => ({ ...prev, leetcodePat: event.target.value }))}
+              className="mt-1 w-full px-3 py-2 border border-border bg-background text-foreground rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder={hasKeys.hasLeetKey ? "********" : "session_..."}
+            />
+          </label>
+        </div>
 
-        {keysStatus && <p className={`mt-4 text-sm ${keysStatus.includes('successfully') ? 'text-green-600' : 'text-gray-600'}`}>{keysStatus}</p>}
+        {keysStatus && <p className={`mt-4 text-sm ${keysStatus.includes('successfully') ? 'text-green-600' : 'text-muted-foreground'}`}>{keysStatus}</p>}
 
         <button
           onClick={saveKeys}
           disabled={keysSaving}
-          className="mt-6 flex items-center justify-center gap-2 px-4 py-2 bg-blue-50 text-blue-700 font-medium rounded-lg hover:bg-blue-100 disabled:opacity-60"
+          className="mt-6 flex items-center justify-center gap-2 px-4 py-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 font-medium rounded-lg hover:bg-blue-500/20 disabled:opacity-60"
         >
           {keysSaving ? <Settings className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Update Keys

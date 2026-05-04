@@ -18,30 +18,22 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../ui/sheet";
-import {Menu} from "lucide-react";
+import { Home, Trophy, Activity, User, MessageCircle, HelpCircle, LogOut, Settings, LoaderIcon, MessageSquare, Book, Menu } from "lucide-react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { ToggleColorTheme } from "./toggle-color-theme";
 import { ToggleTheme } from "./toggle-theme";
 import { authClient } from "@/lib/auth-client";
-import {
-  Home,
-  Trophy,
-  Activity,
-  User,
-  LogOut,
-  Settings,
-  LoaderIcon,
-  MessageSquare,
-  Book
-} from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
-import { useEffect } from "react";
 
 export function NavBar() {
   const { data: session, isPending } = authClient.useSession();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
+
+  function handleReplayTour() {
+    window.dispatchEvent(new CustomEvent("prism:replay-tour"));
+  }
 
   const handleLogout = async () => {
     setIsLoggingOut(true);
@@ -77,9 +69,9 @@ export function NavBar() {
 
   const navLinks = [
     { href: "/dashboard", label: "Dashboard", icon: Home },
-    { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
     { href: "/study", label: "Study", icon: Book },
     { href: "/activities", label: "Activities", icon: Activity },
+    { href: "/leaderboard", label: "Leaderboard", icon: Trophy },
   ];
 
   return (
@@ -99,6 +91,7 @@ export function NavBar() {
             <Link
               key={link.href}
               href={link.href}
+              id={`tour-nav-${link.label.toLowerCase()}`}
               className={buttonVariants({ variant: "ghost" })}
             >
               <link.icon className="size-4" />
@@ -152,6 +145,13 @@ export function NavBar() {
                       <Settings className="mr-2 size-4" />
                       Settings
                     </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={handleReplayTour}
+                    className="cursor-pointer"
+                  >
+                    <HelpCircle className="mr-2 size-4" />
+                    Replay Page Tour
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -229,6 +229,13 @@ export function NavBar() {
                     <Settings className="size-4" />
                     Settings
                   </Link>
+                  <button
+                    onClick={() => { setMobileOpen(false); handleReplayTour(); }}
+                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground w-full text-left"
+                  >
+                    <HelpCircle className="size-4" />
+                    Replay Page Tour
+                  </button>
 
                   <div className="flex items-center gap-2 px-3 py-2.5">
                     <ToggleTheme />

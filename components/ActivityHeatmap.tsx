@@ -28,7 +28,7 @@ export function ActivityHeatmap() {
   }, [])
 
   const getColor = (count: number) => {
-    if (count === 0) return 'bg-slate-100';
+    if (count === 0) return 'bg-muted dark:bg-muted';
     if (count <= 2) return 'bg-emerald-200';
     if (count <= 4) return 'bg-emerald-400';
     if (count <= 6) return 'bg-teal-500';
@@ -112,10 +112,10 @@ export function ActivityHeatmap() {
   });
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 sm:p-6 mb-6 overflow-hidden">
+    <div className="bg-card rounded-xl shadow-sm border border-border p-5 sm:p-6 mb-6 overflow-hidden">
       <div className="flex items-center justify-between gap-4 mb-5">
-        <h2 className="text-lg font-semibold text-gray-900">Activity Heatmap</h2>
-        <p className="text-xs font-medium text-slate-500">This year</p>
+        <h2 className="text-lg font-semibold text-foreground">Activity Heatmap</h2>
+        <p className="text-xs font-medium text-muted-foreground">This year</p>
       </div>
 
       <div className="overflow-x-auto pb-1">

@@ -85,21 +85,21 @@ export default function Discussion() {
       case "Collaboration":
         return "bg-purple-100 text-purple-700";
       default:
-        return "bg-gray-100 text-gray-700";
+        return "bg-muted text-muted-foreground";
     }
   };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Discussion</h1>
-        <p className="text-gray-600 mt-1">Connect with your squad and share ideas</p>
+        <h1 className="text-3xl font-bold text-foreground">Discussion</h1>
+        <p className="text-muted-foreground mt-1">Connect with your squad and share ideas</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div className="lg:col-span-2">
           <Tabs defaultValue="forum" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList id="tour-discussion-tabs" className="grid w-full grid-cols-2">
               <TabsTrigger value="forum">
                 <MessageSquare className="w-4 h-4 mr-2" />
                 Forum
@@ -150,7 +150,7 @@ export default function Discussion() {
 
               <div className="flex items-center gap-3">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input placeholder="Search discussions..." className="pl-10" />
                 </div>
                 <Button variant="outline">Filter</Button>
@@ -172,10 +172,10 @@ export default function Discussion() {
                         <div className="flex-1">
                           <div className="flex items-start justify-between mb-2">
                             <div>
-                              <h3 className="font-semibold text-gray-900 mb-1">
+                              <h3 className="font-semibold text-foreground mb-1">
                                 {discussion.title}
                               </h3>
-                              <div className="flex items-center gap-2 text-sm text-gray-600">
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <span className="font-medium">{discussion.author}</span>
                                 <span>•</span>
                                 <span>{discussion.squad}</span>
@@ -187,8 +187,8 @@ export default function Discussion() {
                               {discussion.category}
                             </Badge>
                           </div>
-                          <p className="text-gray-700 mb-3">{discussion.content}</p>
-                          <div className="flex items-center gap-4 text-sm text-gray-600">
+                          <p className="text-foreground/80 mb-3">{discussion.content}</p>
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground">
                             <button className="flex items-center gap-1 hover:text-blue-600 transition-colors">
                               <ThumbsUp className="w-4 h-4" />
                               <span>{discussion.likes}</span>
@@ -219,7 +219,7 @@ export default function Discussion() {
                     {squads.map((squad) => (
                       <div
                         key={squad.id}
-                        className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                        className="flex items-center justify-between p-4 border border-border rounded-lg hover:bg-muted/60 transition-colors"
                       >
                         <div className="flex items-center gap-4">
                           <div
@@ -228,8 +228,8 @@ export default function Discussion() {
                             #{squad.rank}
                           </div>
                           <div>
-                            <h3 className="font-semibold text-gray-900">{squad.name}</h3>
-                            <p className="text-sm text-gray-600">{squad.members} members</p>
+                            <h3 className="font-semibold text-foreground">{squad.name}</h3>
+                            <p className="text-sm text-muted-foreground">{squad.members} members</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
@@ -237,7 +237,7 @@ export default function Discussion() {
                             <div className="text-2xl font-bold text-blue-600">
                               {squad.score.toLocaleString()}
                             </div>
-                            <div className="text-xs text-gray-600">points</div>
+                            <div className="text-xs text-muted-foreground">points</div>
                           </div>
                           {squad.rank <= 3 && (
                             <Trophy
@@ -259,16 +259,16 @@ export default function Discussion() {
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Current Rank</span>
+                      <span className="text-muted-foreground">Current Rank</span>
                       <span className="text-2xl font-bold text-blue-600">#1</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Squad Score</span>
-                      <span className="text-2xl font-bold text-gray-900">2,450</span>
+                      <span className="text-muted-foreground">Squad Score</span>
+                      <span className="text-2xl font-bold text-foreground">2,450</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-600">Members</span>
-                      <span className="text-lg font-semibold text-gray-900">12</span>
+                      <span className="text-muted-foreground">Members</span>
+                      <span className="text-lg font-semibold text-foreground">12</span>
                     </div>
                     <Button className="w-full bg-blue-600 hover:bg-blue-700">
                       <Users className="w-4 h-4 mr-2" />
@@ -299,7 +299,7 @@ export default function Discussion() {
                       >
                         {squad.rank}
                       </div>
-                      <span className="font-medium text-gray-900">{squad.name}</span>
+                      <span className="font-medium text-foreground">{squad.name}</span>
                     </div>
                     <span className="text-sm font-semibold text-blue-600">{squad.score}</span>
                   </div>
@@ -343,15 +343,15 @@ export default function Discussion() {
             <CardContent>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Total Posts</span>
+                  <span className="text-muted-foreground">Total Posts</span>
                   <span className="font-semibold">247</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Active Today</span>
+                  <span className="text-muted-foreground">Active Today</span>
                   <span className="font-semibold">42</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Your Posts</span>
+                  <span className="text-muted-foreground">Your Posts</span>
                   <span className="font-semibold text-blue-600">8</span>
                 </div>
               </div>
