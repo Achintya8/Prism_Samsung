@@ -57,3 +57,30 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: 'invalid request body' }, { status: 400 })
   }
 }
+export async function DELETE(request: Request) {
+  const session = await auth.api.getSession({ headers: await headers() })
+  if (!session?.user?.id) {
+    return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+    const body = await request.json()
+    const subjectId = body.id || body.subjectId || body.directoryId
+
+    if (!subjectId) {
+      return NextResponse.json({ ok: false, error: 'subjectId is required' }, { status: 400 })
+    }
+
+    await connectToDB()
+    const result = await Subject.deleteOne({ _id: subjectId, userId: session.user.id })
+    
+    if (result.deletedCount === 0) {
+      return NextResponse.json({ ok: false, error: 'subject not found or unauthorized' }, { status: 404 })
+    }
+
+    return NextResponse.json({ ok: true })
+  } catch (error: any) {
+    console.error('Subject Delete Error:', error)
+    return NextResponse.json({ ok: false, error: error?.message || 'Server error' }, { status: 500 })
+  }
+}

@@ -336,6 +336,7 @@ export function AIStudy() {
 
   async function deleteNote(note: Note) {
     if (!selectedSubject) return;
+    if (!window.confirm('Are you sure you want to delete this note?')) return;
     setLoading(true);
     setStatus('');
     try {
@@ -351,6 +352,30 @@ export function AIStudy() {
       setView('notes');
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Could not delete note');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function deleteSubject(subject: Subject) {
+    if (!window.confirm(`Are you sure you want to delete "${subject.name}"? This will delete all notes and whiteboards inside.`)) return;
+    setLoading(true);
+    setStatus('');
+    try {
+      const response = await fetch('/api/ai/directories', {
+        method: 'DELETE',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ id: subject.id }),
+      });
+      const json = await response.json();
+      if (!response.ok || !json?.ok) throw new Error(json?.error || 'Could not delete subject');
+      await loadSubjects();
+      if (selectedSubject?.id === subject.id) {
+        setSelectedSubject(null);
+        setView('subjects');
+      }
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Could not delete subject');
     } finally {
       setLoading(false);
     }
@@ -531,10 +556,9 @@ export function AIStudy() {
             {subjects.map((subject) => (
               <div 
                 key={subject.id} 
-                onClick={() => handleSubjectClick(subject)} 
-                className="bg-card rounded-2xl p-4 sm:p-5 border border-border hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/5 transition-all cursor-pointer group"
+                className="bg-card rounded-2xl p-4 sm:p-5 border border-border hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/5 transition-all cursor-pointer group relative"
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4" onClick={() => handleSubjectClick(subject)}>
                   <div className={`w-12 h-12 sm:w-14 sm:h-14 ${subject.color} rounded-xl flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform`}>
                     <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                   </div>
@@ -544,6 +568,16 @@ export function AIStudy() {
                   </div>
                   <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-blue-500 transition-colors" />
                 </div>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteSubject(subject);
+                  }}
+                  className="absolute top-2 right-2 p-1.5 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                  title="Delete subject"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
             ))}
             {subjects.length === 0 && <div className="sm:col-span-2 lg:col-span-3 bg-card rounded-2xl p-8 border border-dashed border-border text-center text-muted-foreground">Create your first subject to start using ClawMind.</div>}
@@ -576,34 +610,45 @@ export function AIStudy() {
             {notes.map((note) => (
               <div 
                 key={note.id} 
-                onClick={() => handleNoteClick(note)} 
-                className="bg-card rounded-2xl p-5 border border-border hover:border-blue-400 hover:shadow-md transition-all cursor-pointer group flex flex-col h-full"
+                className="bg-card rounded-2xl p-5 border border-border hover:border-blue-400 hover:shadow-md transition-all cursor-pointer group flex flex-col h-full relative"
               >
-                <div className="flex items-start justify-between mb-3">
-                  <div className="p-2.5 bg-blue-100/60 dark:bg-blue-900/30 rounded-xl group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
-                    <FileText className="w-6 h-6 text-blue-600" />
+                <div onClick={() => handleNoteClick(note)} className="flex-1 flex flex-col">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="p-2.5 bg-blue-100/60 dark:bg-blue-900/30 rounded-xl group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
+                      <FileText className="w-6 h-6 text-blue-600" />
+                    </div>
+                    {note.hasQuiz && (
+                      <span className="flex items-center gap-1 px-2.5 py-1 bg-purple-100/60 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-[10px] font-bold uppercase tracking-wider rounded-full border border-purple-200 dark:border-purple-800">
+                        <BrainCircuit className="w-3 h-3" />
+                        Quiz Ready
+                      </span>
+                    )}
                   </div>
-                  {note.hasQuiz && (
-                    <span className="flex items-center gap-1 px-2.5 py-1 bg-purple-100/60 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-[10px] font-bold uppercase tracking-wider rounded-full border border-purple-200 dark:border-purple-800">
-                      <BrainCircuit className="w-3 h-3" />
-                      Quiz Ready
-                    </span>
-                  )}
-                </div>
-                
-                <h3 className="font-bold text-foreground text-lg mb-2 line-clamp-1">{note.title}</h3>
-                
-                <div className="text-sm text-muted-foreground line-clamp-3 mb-4 flex-1">
-                  {note.content.replace(/[#*`]/g, '').slice(0, 150)}...
-                </div>
-                
-                <div className="flex items-center justify-between pt-4 border-t border-border mt-auto">
-                  <span className="text-xs text-muted-foreground font-medium">{note.createdDate || 'Recently added'}</span>
-                  <div className="flex items-center text-blue-600 text-xs font-bold gap-1 group-hover:translate-x-1 transition-transform">
-                    View Full Note
-                    <ChevronRight className="w-4 h-4" />
+                  
+                  <h3 className="font-bold text-foreground text-lg mb-2 line-clamp-1">{note.title}</h3>
+                  
+                  <div className="text-sm text-muted-foreground line-clamp-3 mb-4 flex-1">
+                    {note.content.replace(/[#*`]/g, '').slice(0, 150)}...
+                  </div>
+                  
+                  <div className="flex items-center justify-between pt-4 border-t border-border mt-auto">
+                    <span className="text-xs text-muted-foreground font-medium">{note.createdDate || 'Recently added'}</span>
+                    <div className="flex items-center text-blue-600 text-xs font-bold gap-1 group-hover:translate-x-1 transition-transform">
+                      View Full Note
+                      <ChevronRight className="w-4 h-4" />
+                    </div>
                   </div>
                 </div>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteNote(note);
+                  }}
+                  className="absolute top-4 right-4 p-1.5 text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+                  title="Delete note"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
             ))}
             {notes.length === 0 && (
