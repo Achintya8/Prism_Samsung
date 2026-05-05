@@ -17,7 +17,7 @@ const TOUR_FLOW: {
     steps: () => [
       {
         popover: {
-          title: "👋 Welcome to Prism!",
+          title: "👋 Welcome to Productivity Tracker!",
           description:
             "This quick tour will guide you through the whole app. Click Next to continue or × to exit.",
         },
