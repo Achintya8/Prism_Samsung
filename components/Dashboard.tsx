@@ -19,6 +19,7 @@ const StreakDisplay = dynamic(() => import('./StreakDisplay').then(m => ({ defau
 import { ActivityCard } from "./ActivityCard";
 import { Leaderboard } from './Leaderboard'
 import { ClawMind } from './ClawMind'
+import { Skeleton } from "@/components/ui/skeleton";
 
 const statSurface =
   "rounded-xl border border-border bg-card p-4 text-card-foreground shadow-sm ring-1 ring-foreground/10";
@@ -37,31 +38,62 @@ export function Dashboard() {
     leetcodeUsername: '',
   })
   const [activities, setActivities] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     async function load() {
+      setIsLoading(true)
       try {
-        const sres = await fetch('/api/stats')
-        if (sres.ok) {
+        const [sres, ares] = await Promise.all([
+          fetch('/api/stats').catch(() => null),
+          fetch('/api/activities').catch(() => null)
+        ])
+        
+        if (sres?.ok) {
           const json = await sres.json()
           if (json?.ok && json.stats) setStats((prev) => ({ ...prev, ...json.stats }))
         }
-      } catch (e) {
-        // ignore - keep mock data
-      }
-
-      try {
-        const ares = await fetch('/api/activities')
-        if (ares.ok) {
+        
+        if (ares?.ok) {
           const json = await ares.json()
           if (json?.ok && Array.isArray(json.activities)) {
             setActivities(json.activities.slice(0, 5))
           }
         }
-      } catch (e) { }
+      } catch (e) {
+        // ignore errors
+      } finally {
+        setIsLoading(false)
+      }
     }
     load()
   }, [])
+
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 pb-20 md:pb-6 space-y-4 sm:space-y-6">
+        <Skeleton className="h-[88px] sm:h-[104px] w-full rounded-xl" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+          <Skeleton className="h-[72px] sm:h-[90px] w-full rounded-xl" />
+          <Skeleton className="h-[72px] sm:h-[90px] w-full rounded-xl" />
+          <Skeleton className="h-[72px] sm:h-[90px] w-full rounded-xl" />
+          <Skeleton className="h-[72px] sm:h-[90px] w-full rounded-xl" />
+        </div>
+        <div className="space-y-3">
+          <Skeleton className="h-5 w-32" />
+          <div className="flex gap-3">
+            <Skeleton className="h-[38px] w-[100px] rounded-xl" />
+            <Skeleton className="h-[38px] w-[100px] rounded-xl" />
+            <Skeleton className="h-[38px] w-[100px] rounded-xl" />
+          </div>
+        </div>
+        <div className="grid gap-4 lg:col-span-2">
+          <Skeleton className="h-[250px] w-full rounded-xl" />
+          <Skeleton className="h-[300px] w-full rounded-xl" />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 pb-20 md:pb-6">

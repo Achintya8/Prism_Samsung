@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { RefreshCcw, Save, Settings } from "lucide-react";
 import { GithubIcon } from "./icons/GithubIcon";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type ProfileData = {
   name: string
@@ -62,25 +63,32 @@ export function Profile() {
   const [hasKeys, setHasKeys] = useState({ hasOpenAI: false, hasAnthropic: false, hasGemini: false, hasGithubPat: false, hasLeetKey: false })
   const [keysSaving, setKeysSaving] = useState(false)
   const [keysStatus, setKeysStatus] = useState('')
+  const [initialLoading, setInitialLoading] = useState(true)
 
   async function loadProfile() {
-    const response = await fetch('/api/profile')
-    if (!response.ok) return
-    const json = await response.json()
-    if (json?.ok && json.profile) {
-      setProfile(json.profile)
-      setForm({
-        name: json.profile.name || '',
-        githubUsername: json.profile.githubUsername || '',
-        leetcodeUsername: json.profile.leetcodeUsername || '',
-      })
-    }
-    const keysRes = await fetch('/api/profile/keys', { cache: 'no-store' })
-    if (keysRes.ok) {
-      const kjson = await keysRes.json()
-      if (kjson?.ok) {
-        setHasKeys({ hasOpenAI: kjson.hasOpenAI, hasAnthropic: kjson.hasAnthropic, hasGemini: kjson.hasGemini, hasGithubPat: kjson.hasGithubPat, hasLeetKey: kjson.hasLeetKey })
+    setInitialLoading(true)
+    try {
+      const response = await fetch('/api/profile')
+      if (response.ok) {
+        const json = await response.json()
+        if (json?.ok && json.profile) {
+          setProfile(json.profile)
+          setForm({
+            name: json.profile.name || '',
+            githubUsername: json.profile.githubUsername || '',
+            leetcodeUsername: json.profile.leetcodeUsername || '',
+          })
+        }
       }
+      const keysRes = await fetch('/api/profile/keys', { cache: 'no-store' })
+      if (keysRes.ok) {
+        const kjson = await keysRes.json()
+        if (kjson?.ok) {
+          setHasKeys({ hasOpenAI: kjson.hasOpenAI, hasAnthropic: kjson.hasAnthropic, hasGemini: kjson.hasGemini, hasGithubPat: kjson.hasGithubPat, hasLeetKey: kjson.hasLeetKey })
+        }
+      }
+    } finally {
+      setInitialLoading(false)
     }
   }
 
@@ -167,6 +175,48 @@ export function Profile() {
     } finally {
       setKeysSaving(false)
     }
+  if (initialLoading) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 pb-20 md:pb-6 space-y-6">
+        <div className="bg-card rounded-xl p-6 border border-border">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+            <Skeleton className="w-20 h-20 rounded-full shrink-0" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+            <Skeleton className="h-10 w-24 rounded-lg shrink-0" />
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+            <Skeleton className="h-[88px] w-full rounded-lg" />
+            <Skeleton className="h-[88px] w-full rounded-lg" />
+            <Skeleton className="h-[88px] w-full rounded-lg" />
+            <Skeleton className="h-[88px] w-full rounded-lg" />
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <Skeleton className="h-16 w-full rounded-lg" />
+            <Skeleton className="h-16 w-full rounded-lg" />
+            <Skeleton className="h-16 w-full rounded-lg" />
+            <Skeleton className="h-[88px] w-full rounded-lg" />
+          </div>
+          <Skeleton className="h-10 w-full mt-6 rounded-lg" />
+        </div>
+        <div className="bg-card rounded-xl p-6 border border-border mt-6">
+          <Skeleton className="h-8 w-48 mb-4" />
+          <Skeleton className="h-4 w-full max-w-xl mb-6" />
+          <div className="grid sm:grid-cols-3 gap-4">
+            <Skeleton className="h-16 w-full rounded-lg" />
+            <Skeleton className="h-16 w-full rounded-lg" />
+            <Skeleton className="h-16 w-full rounded-lg" />
+          </div>
+          <Skeleton className="h-6 w-48 mt-6 mb-3" />
+          <Skeleton className="h-4 w-full max-w-xl mb-4" />
+          <Skeleton className="h-16 w-full max-w-md mt-4 rounded-lg" />
+          <Skeleton className="h-16 w-full max-w-md mt-4 rounded-lg" />
+          <Skeleton className="h-10 w-full mt-6 rounded-lg" />
+        </div>
+      </div>
+    )
   }
 
   return (

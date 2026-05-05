@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Medal, Trophy, RefreshCcw } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type LeaderboardEntry = {
   userId?: string
@@ -82,6 +83,7 @@ export function Leaderboard() {
   const [list, setList] = useState<LeaderboardEntry[]>([])
   const [userEntry, setUserEntry] = useState<LeaderboardEntry | null>(null)
   const [loading, setLoading] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(true)
 
   useEffect(() => {
     // Fetch user's rank immediately (fast, single query)
@@ -116,8 +118,8 @@ export function Leaderboard() {
     }
 
     // Start both in parallel
-    void loadUserRank()
-    void loadFullLeaderboard()
+    setInitialLoading(true)
+    Promise.all([loadUserRank(), loadFullLeaderboard()]).finally(() => setInitialLoading(false))
   }, [])
 
   const load = async () => {
@@ -142,6 +144,48 @@ export function Leaderboard() {
     { entry: entries[0], place: 'first' as const, className: entries.length === 1 ? 'order-1 sm:order-2 sm:col-start-2' : 'order-1 sm:order-2' },
     { entry: entries[2], place: 'side' as const, className: 'order-3' },
   ].filter((item) => item.entry)
+
+  if (initialLoading) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
+        <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border overflow-hidden">
+          <div className="p-6 h-[104px]">
+            <Skeleton className="h-8 w-64 mb-2" />
+            <Skeleton className="h-4 w-48" />
+          </div>
+          <div className="p-4 sm:p-6 border-b border-border">
+            <Skeleton className="h-4 w-24 mb-4" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Skeleton className="w-12 h-12 rounded-full" />
+                <div className="space-y-2">
+                  <Skeleton className="h-5 w-32" />
+                  <Skeleton className="h-4 w-40" />
+                </div>
+              </div>
+              <div className="space-y-2 text-right">
+                <Skeleton className="h-8 w-16 ml-auto" />
+                <Skeleton className="h-3 w-10 ml-auto" />
+              </div>
+            </div>
+          </div>
+          <div className="p-6 h-[500px]">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto mb-6">
+              <Skeleton className="h-32 w-full rounded-xl" />
+              <Skeleton className="h-40 w-full rounded-xl" />
+              <Skeleton className="h-32 w-full rounded-xl" />
+            </div>
+            <div className="max-w-2xl mx-auto space-y-2 mt-10">
+              <Skeleton className="h-14 w-full rounded-lg" />
+              <Skeleton className="h-14 w-full rounded-lg" />
+              <Skeleton className="h-14 w-full rounded-lg" />
+              <Skeleton className="h-14 w-full rounded-lg" />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div id="tour-leaderboard" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">

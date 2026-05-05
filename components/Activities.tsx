@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Plus, Code2, RefreshCcw, X } from "lucide-react";
 import { GithubIcon } from "./icons/GithubIcon";
 import { ActivityCard } from "./ActivityCard";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type ActivityType = 'github' | 'leetcode' | 'gym' | 'jogging' | 'study' | 'project'
 
@@ -61,6 +62,7 @@ export function Activities() {
   const [status, setStatus] = useState('');
   const [loading, setLoading] = useState(false);
   const [syncing, setSyncing] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
 
   const loadActivities = useCallback(async () => {
     const response = await fetch('/api/activities?limit=50');
@@ -89,7 +91,9 @@ export function Activities() {
   }, []);
 
   const refreshPageData = useCallback(async () => {
+    setInitialLoading(true);
     await Promise.all([loadActivities(), loadProfile()]);
+    setInitialLoading(false);
   }, [loadActivities, loadProfile]);
 
   useEffect(() => {
@@ -185,6 +189,22 @@ export function Activities() {
 
   const githubConnected = Boolean(profile.githubUsername);
   const leetcodeConnected = Boolean(profile.leetcodeUsername);
+
+  if (initialLoading) {
+    return (
+      <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 pb-20 md:pb-6 space-y-6">
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <Skeleton className="h-8 w-32 mb-2" />
+            <Skeleton className="h-4 w-48" />
+          </div>
+          <Skeleton className="h-10 w-32 rounded-lg" />
+        </div>
+        <Skeleton className="h-[200px] w-full rounded-xl" />
+        <Skeleton className="h-[400px] w-full rounded-xl" />
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 pb-20 md:pb-6">
