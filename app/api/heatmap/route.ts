@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { headers } from 'next/headers'
 import { auth } from '@/lib/auth'
 import connectToDB from '@/lib/mongodb'
+import { Activity } from '@/lib/models/Activity'
 import { DailyActivityLog } from '@/lib/models/DailyActivityLog'
 
 export async function GET(request: Request) {
@@ -29,9 +30,28 @@ export async function GET(request: Request) {
       .sort({ date: 1 })
       .lean()
 
+    const activities = await Activity.find({
+      userId,
+      date: {
+        $gte: new Date(`${year}-01-01T00:00:00.000Z`),
+        $lte: new Date(`${year}-12-31T23:59:59.999Z`),
+      },
+    })
+      .sort({ date: 1 })
+      .select('title date')
+      .lean()
+
+    const activitiesByDate = activities.reduce<Record<string, string[]>>((acc, activity) => {
+      const date = new Date(activity.date).toISOString().slice(0, 10)
+      if (!acc[date]) acc[date] = []
+      acc[date].push(activity.title)
+      return acc
+    }, {})
+
     const heatmapData = logs.map((log) => ({
       date: log.date,
       count: log.totalCount,
+      activities: activitiesByDate[log.date] ?? [],
     }))
 
     return NextResponse.json({ ok: true, year, data: heatmapData })

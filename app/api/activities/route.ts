@@ -31,7 +31,24 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url)
     const limit = Math.min(Number(searchParams.get('limit') || 25), 100)
-    const events = await Activity.find({ userId }).sort({ date: -1 }).limit(limit).lean<ActivityEvent[]>()
+    const dateQuery = searchParams.get('date')
+
+    let query: any = { userId }
+    if (dateQuery) {
+      const startDate = new Date(dateQuery)
+      startDate.setUTCHours(0, 0, 0, 0)
+      const endDate = new Date(dateQuery)
+      endDate.setUTCHours(23, 59, 59, 999)
+      query = {
+        userId,
+        $or: [
+          { date: { $gte: startDate, $lte: endDate } },
+          { createdAt: { $gte: startDate, $lte: endDate }, date: null }
+        ]
+      }
+    }
+
+    const events = await Activity.find(query).sort({ date: -1 }).limit(dateQuery ? 1000 : limit).lean<ActivityEvent[]>()
     
     const activities = events.map((event) => ({
       id: event._id.toString(),

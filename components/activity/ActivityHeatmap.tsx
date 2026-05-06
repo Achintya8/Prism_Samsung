@@ -1,11 +1,14 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-
-type HeatmapPoint = { date: string; count: number }
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import {HeatmapPoint, ActivityCacheEntry} from "@/types"
+// type HeatmapPoint = { date: string; count: number; activities?: string[] }
+// type ActivityCacheEntry = { status: 'idle' | 'loading' | 'loaded' | 'error'; activities: string[] }
 
 export function ActivityHeatmap() {
   const [heatmapData, setHeatmapData] = useState<HeatmapPoint[]>([])
+  const [activityCache, setActivityCache] = useState<Record<string, ActivityCacheEntry>>({})
 
   useEffect(() => {
     async function load() {
@@ -27,8 +30,37 @@ export function ActivityHeatmap() {
     load()
   }, [])
 
+  async function loadActivitiesForDate(date: string) {
+    if (activityCache[date]?.status === 'loading' || activityCache[date]?.status === 'loaded') return
+
+    setActivityCache((current) => ({
+      ...current,
+      [date]: { status: 'loading', activities: current[date]?.activities ?? [] },
+    }))
+
+    try {
+      const response = await fetch(`/api/activities?date=${date}&limit=100`)
+      const json = await response.json()
+      const activities = Array.isArray(json?.activities)
+        ? json.activities
+            .map((activity: { title?: string }) => activity.title)
+            .filter((title: unknown): title is string => typeof title === 'string' && title.trim().length > 0)
+        : []
+
+      setActivityCache((current) => ({
+        ...current,
+        [date]: { status: 'loaded', activities },
+      }))
+    } catch {
+      setActivityCache((current) => ({
+        ...current,
+        [date]: { status: 'error', activities: [] },
+      }))
+    }
+  }
+
   const getColor = (count: number) => {
-    if (count === 0) return 'bg-slate-100';
+    if (count === 0) return 'bg-muted dark:bg-muted';
     if (count <= 2) return 'bg-emerald-200';
     if (count <= 4) return 'bg-emerald-400';
     if (count <= 6) return 'bg-teal-500';
@@ -112,10 +144,10 @@ export function ActivityHeatmap() {
   });
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 sm:p-6 mb-6 overflow-hidden">
+    <div className="bg-card rounded-xl shadow-sm border border-border p-5 sm:p-6 mb-6 overflow-hidden">
       <div className="flex items-center justify-between gap-4 mb-5">
-        <h2 className="text-lg font-semibold text-gray-900">Activity Heatmap</h2>
-        <p className="text-xs font-medium text-slate-500">This year</p>
+        <h2 className="text-lg font-semibold text-foreground">Activity Heatmap</h2>
+        <p className="text-xs font-medium text-muted-foreground">This year</p>
       </div>
 
       <div className="overflow-x-auto pb-1">
@@ -152,12 +184,48 @@ export function ActivityHeatmap() {
             {weeks.map((week, weekIndex) => (
               <div key={weekIndex} className="flex flex-col" style={{ gap: GAP }}>
                 {week.map((day) => (
-                  <div
-                    key={day.date}
-                    style={{ width: CELL, height: CELL }}
-                    className={day.count === -1 ? 'opacity-0 pointer-events-none' : `${getColor(day.count)} rounded-[3px] ring-1 ring-inset ring-white/70 hover:scale-125 hover:ring-slate-500 cursor-pointer transition-transform`}
-                    title={day.count === -1 ? '' : `${day.date}: ${day.count} activities`}
-                  />
+                  day.count === -1 ? (
+                    <div
+                      key={day.date}
+                      style={{ width: CELL, height: CELL }}
+                      className="opacity-0 pointer-events-none"
+                    />
+                  ) : (
+                    <Tooltip key={day.date}>
+                      <TooltipTrigger asChild>
+                        <div
+                          onMouseEnter={() => { void loadActivitiesForDate(day.date) }}
+                          style={{ width: CELL, height: CELL }}
+                          className={`${getColor(day.count)} rounded-[3px] ring-1 ring-inset ring-white/70 hover:scale-125 hover:ring-slate-500 cursor-pointer transition-transform`}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent side="top" sideOffset={8} className="max-w-xs border border-border bg-popover text-popover-foreground shadow-md">
+                        <div className="space-y-1.5">
+                          <div className="text-xs font-semibold">{day.date}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {day.count} {day.count === 1 ? 'activity' : 'activities'}
+                          </div>
+                          <div className="space-y-1">
+                            {(activityCache[day.date]?.status === 'loaded' && activityCache[day.date].activities.length > 0)
+                              ? activityCache[day.date].activities.map((activity, index) => (
+                                <div key={`${day.date}-${index}`} className="text-xs leading-snug">
+                                  {activity}
+                                </div>
+                              ))
+                              : activityCache[day.date]?.status === 'loading'
+                                ? <div className="text-xs leading-snug text-muted-foreground">Loading activities...</div>
+                                : day.activities && day.activities.length > 0
+                                  ? day.activities.map((activity, index) => (
+                                      <div key={`${day.date}-${index}`} className="text-xs leading-snug">
+                                        {activity}
+                                      </div>
+                                    ))
+                                  : <div className="text-xs leading-snug text-muted-foreground">No activities recorded.</div>}
+                          </div>
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  )
                 ))}
               </div>
             ))}

@@ -6,39 +6,39 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { Tldraw } from 'tldraw';
 import 'tldraw/tldraw.css';
-import { NavBar } from "./navbar/navbar";
+// import { NavBar } from "../navbar/navbar";
+import {QuizQuestion, Note, Subject, Whiteboard} from "@/types"
+// type QuizQuestion = {
+//   question: string
+//   options: string[]
+//   correctAnswer: string
+//   explanation: string
+// }
 
-type QuizQuestion = {
-  question: string
-  options: string[]
-  correctAnswer: string
-  explanation: string
-}
+// type Note = {
+//   id: string
+//   subjectId: string
+//   title: string
+//   content: string
+//   createdDate: string
+//   hasQuiz: boolean
+//   quiz?: QuizQuestion[]
+// }
 
-type Note = {
-  id: string
-  subjectId: string
-  title: string
-  content: string
-  createdDate: string
-  hasQuiz: boolean
-  quiz?: QuizQuestion[]
-}
+// type Subject = {
+//   id: string
+//   name: string
+//   color: string
+//   notesCount: number
+//   notes?: Note[]
+// }
 
-type Subject = {
-  id: string
-  name: string
-  color: string
-  notesCount: number
-  notes?: Note[]
-}
-
-type Whiteboard = {
-  _id?: string
-  title?: string
-  image: string
-  createdDate?: string
-}
+// type Whiteboard = {
+//   _id?: string
+//   title?: string
+//   image: string
+//   createdDate?: string
+// }
 
 export function AIStudy() {
   const [view, setView] = useState<'subjects' | 'notes' | 'noteDetail' | 'quiz' | 'whiteboard'>('subjects');
@@ -454,12 +454,12 @@ export function AIStudy() {
           <button
             onClick={handleBack}
             disabled={view === 'quiz' && quizLoading}
-            className="p-2 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed w-fit"
+            className="p-2 hover:bg-muted rounded-lg disabled:opacity-50 disabled:cursor-not-allowed w-fit"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-700" />
+            <ArrowLeft className="w-5 h-5 text-foreground/70" />
           </button>
           <div className="flex-1 flex items-start justify-center pt-4">
-            <div className="w-full max-w-2xl sm:max-w-4xl lg:max-w-6xl h-5/6 rounded-lg border border-gray-200 overflow-hidden shadow-lg">
+            <div className="w-full max-w-2xl sm:max-w-4xl lg:max-w-6xl h-5/6 rounded-lg border border-border overflow-hidden shadow-lg">
               <Tldraw />
             </div>
           </div>
@@ -474,18 +474,18 @@ export function AIStudy() {
                 <button
                   onClick={handleBack}
                   disabled={view === 'quiz' && quizLoading}
-                  className="p-2 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="p-2 hover:bg-muted rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <ArrowLeft className="w-5 h-5 text-gray-700" />
+                  <ArrowLeft className="w-5 h-5 text-foreground/70" />
                 </button>
               )}
-              <h1 className="text-2xl font-semibold text-gray-900">ClawMind</h1>
+              <h1 className="text-2xl font-semibold text-foreground">ClawMind</h1>
               <div className="ml-auto flex items-center gap-2">
-                <span className="text-sm text-gray-500 hidden sm:inline">AI Model:</span>
+                <span className="text-sm text-muted-foreground hidden sm:inline">AI Model:</span>
                 <select 
                   value={provider} 
                   onChange={e => setProvider(e.target.value as any)}
-                  className="text-sm border border-gray-300 rounded-md py-1 px-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  className="text-sm border border-border rounded-md py-1 px-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-background text-foreground"
                 >
                   <option value="openai">OpenAI</option>
                   <option value="claude">Claude</option>
@@ -493,7 +493,7 @@ export function AIStudy() {
                 </select>
               </div>
             </div>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           {view === 'subjects' && 'Organize your study materials by subject'}
           {view === 'notes' && selectedSubject && `${selectedSubject.name} - ${selectedSubject.notesCount} notes`}
           {view === 'noteDetail' && selectedNote && selectedNote.title}
@@ -510,19 +510,19 @@ export function AIStudy() {
       {view === 'subjects' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="font-semibold text-gray-900">Your Subjects</h2>
-            <button onClick={() => setShowNewSubject(!showNewSubject)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <h2 id="tour-study-subjects" className="font-semibold text-foreground">Your Subjects</h2>
+            <button id="tour-study-new-subject" onClick={() => setShowNewSubject(!showNewSubject)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
               <Plus className="w-4 h-4" />
               New Subject
             </button>
           </div>
 
           {showNewSubject && (
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <input value={subjectName} onChange={(event) => setSubjectName(event.target.value)} type="text" placeholder="Subject name" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3" />
+            <div className="bg-card rounded-xl border border-border p-4">
+              <input value={subjectName} onChange={(event) => setSubjectName(event.target.value)} type="text" placeholder="Subject name" className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3" />
               <div className="flex gap-2">
                 <button onClick={createSubject} disabled={loading} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60">Create</button>
-                <button onClick={() => setShowNewSubject(false)} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
+                <button onClick={() => setShowNewSubject(false)} className="px-4 py-2 border border-border text-foreground/80 rounded-lg hover:bg-muted">Cancel</button>
               </div>
             </div>
           )}
@@ -532,21 +532,21 @@ export function AIStudy() {
               <div 
                 key={subject.id} 
                 onClick={() => handleSubjectClick(subject)} 
-                className="bg-white rounded-2xl p-4 sm:p-5 border border-gray-200 hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/5 transition-all cursor-pointer group"
+                className="bg-card rounded-2xl p-4 sm:p-5 border border-border hover:border-blue-500 hover:shadow-lg hover:shadow-blue-500/5 transition-all cursor-pointer group"
               >
                 <div className="flex items-center gap-4">
                   <div className={`w-12 h-12 sm:w-14 sm:h-14 ${subject.color} rounded-xl flex items-center justify-center shadow-inner group-hover:scale-105 transition-transform`}>
                     <BookOpen className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-bold text-gray-900 truncate">{subject.name}</p>
-                    <p className="text-sm text-gray-500">{subject.notesCount} notes</p>
+                    <p className="font-bold text-foreground truncate">{subject.name}</p>
+                    <p className="text-sm text-muted-foreground">{subject.notesCount} notes</p>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-blue-500 transition-colors" />
                 </div>
               </div>
             ))}
-            {subjects.length === 0 && <div className="sm:col-span-2 lg:col-span-3 bg-white rounded-2xl p-8 border border-dashed border-gray-300 text-center text-gray-500">Create your first subject to start using ClawMind.</div>}
+            {subjects.length === 0 && <div className="sm:col-span-2 lg:col-span-3 bg-card rounded-2xl p-8 border border-dashed border-border text-center text-muted-foreground">Create your first subject to start using ClawMind.</div>}
           </div>
         </div>
       )}
@@ -554,7 +554,7 @@ export function AIStudy() {
       {view === 'notes' && selectedSubject && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="font-semibold text-gray-900">Notes</h2>
+            <h2 className="font-semibold text-foreground">Notes</h2>
             <button onClick={() => setShowNewNote(!showNewNote)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
               <Plus className="w-4 h-4" />
               New Note
@@ -562,12 +562,12 @@ export function AIStudy() {
           </div>
 
           {showNewNote && (
-            <div className="bg-white rounded-xl border border-gray-200 p-4">
-              <input value={noteTitle} onChange={(event) => setNoteTitle(event.target.value)} type="text" placeholder="Note title" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3" />
-              <textarea value={noteText} onChange={(event) => setNoteText(event.target.value)} placeholder="Paste text, syllabus points, or a topic for ClawMind to turn into notes" className="w-full min-h-28 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3" />
+            <div className="bg-card rounded-xl border border-border p-4">
+              <input value={noteTitle} onChange={(event) => setNoteTitle(event.target.value)} type="text" placeholder="Note title" className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3" />
+              <textarea value={noteText} onChange={(event) => setNoteText(event.target.value)} placeholder="Paste text, syllabus points, or a topic for ClawMind to turn into notes" className="w-full min-h-28 px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3" />
               <div className="flex gap-2">
                 <button onClick={createNote} disabled={loading} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60">Generate</button>
-                <button onClick={() => setShowNewNote(false)} className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
+                <button onClick={() => setShowNewNote(false)} className="px-4 py-2 border border-border text-foreground/80 rounded-lg hover:bg-muted">Cancel</button>
               </div>
             </div>
           )}
@@ -577,28 +577,28 @@ export function AIStudy() {
               <div 
                 key={note.id} 
                 onClick={() => handleNoteClick(note)} 
-                className="bg-white rounded-2xl p-5 border border-gray-200 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer group flex flex-col h-full"
+                className="bg-card rounded-2xl p-5 border border-border hover:border-blue-400 hover:shadow-md transition-all cursor-pointer group flex flex-col h-full"
               >
                 <div className="flex items-start justify-between mb-3">
-                  <div className="p-2.5 bg-blue-50 rounded-xl group-hover:bg-blue-100 transition-colors">
+                  <div className="p-2.5 bg-blue-100/60 dark:bg-blue-900/30 rounded-xl group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
                     <FileText className="w-6 h-6 text-blue-600" />
                   </div>
                   {note.hasQuiz && (
-                    <span className="flex items-center gap-1 px-2.5 py-1 bg-purple-50 text-purple-700 text-[10px] font-bold uppercase tracking-wider rounded-full border border-purple-100">
+                    <span className="flex items-center gap-1 px-2.5 py-1 bg-purple-100/60 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-[10px] font-bold uppercase tracking-wider rounded-full border border-purple-200 dark:border-purple-800">
                       <BrainCircuit className="w-3 h-3" />
                       Quiz Ready
                     </span>
                   )}
                 </div>
                 
-                <h3 className="font-bold text-gray-900 text-lg mb-2 line-clamp-1">{note.title}</h3>
+                <h3 className="font-bold text-foreground text-lg mb-2 line-clamp-1">{note.title}</h3>
                 
-                <div className="text-sm text-gray-600 line-clamp-3 mb-4 flex-1">
+                <div className="text-sm text-muted-foreground line-clamp-3 mb-4 flex-1">
                   {note.content.replace(/[#*`]/g, '').slice(0, 150)}...
                 </div>
                 
-                <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-auto">
-                  <span className="text-xs text-gray-400 font-medium">{note.createdDate || 'Recently added'}</span>
+                <div className="flex items-center justify-between pt-4 border-t border-border mt-auto">
+                  <span className="text-xs text-muted-foreground font-medium">{note.createdDate || 'Recently added'}</span>
                   <div className="flex items-center text-blue-600 text-xs font-bold gap-1 group-hover:translate-x-1 transition-transform">
                     View Full Note
                     <ChevronRight className="w-4 h-4" />
@@ -607,20 +607,20 @@ export function AIStudy() {
               </div>
             ))}
             {notes.length === 0 && (
-              <div className="sm:col-span-2 bg-gray-50 rounded-2xl p-12 border-2 border-dashed border-gray-200 text-center">
-                <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500 font-medium">No notes yet. Start by generating one!</p>
+              <div className="sm:col-span-2 bg-muted/50 rounded-2xl p-12 border-2 border-dashed border-border text-center">
+                <FileText className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
+                <p className="text-muted-foreground font-medium">No notes yet. Start by generating one!</p>
               </div>
             )}
           </div>
 
           <div className="grid grid-cols-2 gap-3 mt-6">
-            <button onClick={generatePracticeQuiz} className="p-4 bg-white border border-gray-200 rounded-xl hover:border-purple-300 transition-colors text-left">
+            <button onClick={generatePracticeQuiz} className="p-4 bg-card border border-border rounded-xl hover:border-purple-300 transition-colors text-left">
               <BrainCircuit className="w-6 h-6 text-purple-600 mb-2" />
-              <p className="font-medium text-gray-900">Practice Quiz</p>
-              <p className="text-sm text-gray-500">Quiz across all notes</p>
+              <p className="font-medium text-foreground">Practice Quiz</p>
+              <p className="text-sm text-muted-foreground">Quiz across all notes</p>
             </button>
-            <button onClick={() => setView('whiteboard')} className="p-4 bg-white border border-gray-200 rounded-xl hover:border-blue-300 transition-colors text-left">
+            <button onClick={() => setView('whiteboard')} className="p-4 bg-card border border-border rounded-xl hover:border-blue-300 transition-colors text-left">
               <Pencil className="w-6 h-6 text-blue-600 mb-2" />
               <p className="font-medium text-foreground">Whiteboard</p>
               <p className="text-sm text-muted-foreground">Draw diagrams</p>
@@ -631,11 +631,11 @@ export function AIStudy() {
 
       {view === 'noteDetail' && selectedNote && (
         <div className="space-y-4">
-          <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm">
+          <div className="bg-card rounded-2xl p-8 border border-border shadow-sm">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">{selectedNote.title}</h2>
+              <h2 className="text-2xl font-bold text-foreground">{selectedNote.title}</h2>
               <div className="flex items-center gap-3">
-                <div className="text-xs text-gray-400">Created: {selectedNote.createdDate}</div>
+                <div className="text-xs text-muted-foreground">Created: {selectedNote.createdDate}</div>
                 <button
                   onClick={() => deleteNote(selectedNote)}
                   disabled={loading}
@@ -647,12 +647,12 @@ export function AIStudy() {
               </div>
             </div>
             
-            <div className="prose prose-blue max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-strong:text-gray-900 prose-ul:list-disc prose-ol:list-decimal">
+            <div className="prose prose-blue dark:prose-invert max-w-none">
               <ReactMarkdown remarkPlugins={[remarkGfm]}>
                 {selectedNote.content}
               </ReactMarkdown>
             </div>
-            <div className="mt-6 pt-4 border-t border-gray-200 flex gap-3">
+            <div className="mt-6 pt-4 border-t border-border flex gap-3">
               <button onClick={generateQuiz} disabled={loading} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60">
                 {selectedNote.hasQuiz ? 'Open Quiz' : 'Generate Quiz'}
               </button>
@@ -663,28 +663,28 @@ export function AIStudy() {
 
       {view === 'quiz' && (
         <div className="space-y-4">
-          <div className="bg-white rounded-xl p-6 border border-gray-200">
-            <h2 className="font-semibold text-gray-900 mb-4">Practice Quiz</h2>
+          <div className="bg-card rounded-xl p-6 border border-border">
+            <h2 className="font-semibold text-foreground mb-4">Practice Quiz</h2>
             {quizLoading && (
-              <div className="py-10 text-center text-gray-500">
-                <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-gray-200 border-t-gray-500" />
+              <div className="py-10 text-center text-muted-foreground">
+                <div className="mx-auto mb-3 h-8 w-8 animate-spin rounded-full border-2 border-muted border-t-muted-foreground" />
                 Generating your quiz...
               </div>
             )}
             <div className="space-y-5">
               {quizQuestions.map((question, index) => (
-                <div key={`${index}-${question.question}`} className="border border-gray-200 rounded-lg p-4">
-                  <p className="font-medium text-gray-900 mb-3">{index + 1}. {question.question}</p>
+                <div key={`${index}-${question.question}`} className="border border-border rounded-lg p-4">
+                  <p className="font-medium text-foreground mb-3">{index + 1}. {question.question}</p>
                   <div className="grid gap-2">
                     {question.options.map((option) => (
-                      <div key={option} className={`p-3 border rounded-lg ${option === question.correctAnswer ? 'border-green-300 bg-green-50' : 'border-gray-200'}`}>{option}</div>
+                      <div key={option} className={`p-3 border rounded-lg ${option === question.correctAnswer ? 'border-green-400 bg-green-50 dark:bg-green-900/20 dark:border-green-700' : 'border-border'}`}>{option}</div>
                     ))}
                   </div>
-                  <p className="text-sm text-gray-500 mt-3">{question.explanation}</p>
+                  <p className="text-sm text-muted-foreground mt-3">{question.explanation}</p>
                 </div>
               ))}
               {!quizLoading && quizQuestions.length === 0 && (
-                <p className="text-gray-500">Generate a quiz from a note or use Practice Quiz.</p>
+                <p className="text-muted-foreground">Generate a quiz from a note or use Practice Quiz.</p>
               )}
             </div>
           </div>
