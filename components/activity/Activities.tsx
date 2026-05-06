@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Plus, Code2, RefreshCcw, X } from "lucide-react";
 import { GithubIcon } from "../icons/GithubIcon";
 import { ActivityCard } from "./ActivityCard";
@@ -91,43 +92,50 @@ export function Activities() {
     }
   }, []);
 
-  const refreshPageData = useCallback(async () => {
-    setInitialLoading(true);
+  const loadPageData = useCallback(async () => {
     await Promise.all([loadActivities(), loadProfile()]);
-    setInitialLoading(false);
   }, [loadActivities, loadProfile]);
+
+  const loadInitialPageData = useCallback(async () => {
+    setInitialLoading(true);
+    try {
+      await loadPageData();
+    } finally {
+      setInitialLoading(false);
+    }
+  }, [loadPageData]);
+
+  const hasConnectedPlatform = Boolean(profile.githubUsername || profile.leetcodeUsername);
+
+  const autoSyncQuery = useQuery({
+    queryKey: ["platform-sync-auto", profile.githubUsername, profile.leetcodeUsername],
+    queryFn: async () => {
+      const response = await fetch('/api/platform/sync', { method: 'POST' });
+      const json = await response.json();
+      if (!response.ok || !json?.ok) {
+        throw new Error(json?.error || json?.errors?.join(', ') || 'Could not sync platforms');
+      }
+      return json as { ok: boolean; pointsAwarded?: number };
+    },
+    enabled: hasConnectedPlatform,
+    refetchInterval: 5 * 60 * 1000,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: false,
+    retry: false,
+  });
+
+  useEffect(() => {
+    if (!autoSyncQuery.data) return;
+    window.dispatchEvent(new Event('activity:logged'));
+    void loadPageData();
+  }, [autoSyncQuery.data, loadPageData]);
 
   useEffect(() => {
     const id = window.setTimeout(() => {
-      void refreshPageData();
+      void loadInitialPageData();
     }, 0);
     return () => window.clearTimeout(id);
-  }, [refreshPageData]);
-
-  // If the user has never synced platforms before, run a one-time sync when
-  // Activities loads and we have platform usernames available. The server will
-  // set `lastPlatformSyncAt` so this only runs once per user.
-  useEffect(() => {
-    if (profile.lastPlatformSyncAt !== null) return;
-    if (!profile.githubUsername && !profile.leetcodeUsername) return;
-
-    // Fire-and-forget the initial sync; UI state will update when it completes
-    void (async () => {
-      try {
-        setSyncing(true);
-        const response = await fetch('/api/platform/sync', { method: 'POST' });
-        const json = await response.json();
-        if (response.ok && json?.ok) {
-          window.dispatchEvent(new Event('activity:logged'));
-          await refreshPageData();
-        }
-      } catch (e) {
-        // ignore failures for initial sync; user can press Sync manually
-      } finally {
-        setSyncing(false);
-      }
-    })();
-  }, [profile.lastPlatformSyncAt, profile.githubUsername, profile.leetcodeUsername, refreshPageData]);
+  }, [loadInitialPageData]);
 
   function chooseOption(option: ActivityOption) {
     setSelectedOption(option);
@@ -162,7 +170,7 @@ export function Activities() {
       setShowAddForm(false);
       setStatus(`Activity logged for ${json.pointsAwarded} points`);
       window.dispatchEvent(new Event('activity:logged'));
-      await refreshPageData();
+      await loadPageData();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Could not log activity');
     } finally {
@@ -180,7 +188,7 @@ export function Activities() {
       const details = Array.isArray(json.results) ? json.results.map((result: { message: string }) => result.message).join(' | ') : 'Synced latest platform data';
       setStatus(json.pointsAwarded > 0 ? `${details}. Awarded ${json.pointsAwarded} points.` : details);
       window.dispatchEvent(new Event('activity:logged'));
-      await refreshPageData();
+      await loadPageData();
     } catch (error) {
       setStatus(error instanceof Error ? error.message : 'Could not sync platforms');
     } finally {
@@ -201,8 +209,8 @@ export function Activities() {
           </div>
           <Skeleton className="h-10 w-32 rounded-lg" />
         </div>
-        <Skeleton className="h-[200px] w-full rounded-xl" />
-        <Skeleton className="h-[400px] w-full rounded-xl" />
+        <Skeleton className="h-50 w-full rounded-xl" />
+        <Skeleton className="h-100 w-full rounded-xl" />
       </div>
     );
   }
@@ -313,26 +321,26 @@ export function Activities() {
         <div className="space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-4 bg-muted/50 rounded-lg">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <GithubIcon className="w-5 sm:w-6 h-5 sm:h-6 text-muted-foreground flex-shrink-0" />
+              <GithubIcon className="w-5 sm:w-6 h-5 sm:h-6 text-muted-foreground shrink-0" />
               <div className="min-w-0">
                 <p className="text-sm sm:text-base font-medium text-foreground">GitHub</p>
                 <p className="text-xs sm:text-sm text-muted-foreground truncate">{githubConnected ? `${profile.githubUsername}` : 'Add username in Profile'}</p>
               </div>
             </div>
-            <span className={`px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded-full whitespace-nowrap flex-shrink-0 ${githubConnected ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-muted text-muted-foreground'}`}>
+            <span className={`px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded-full whitespace-nowrap shrink-0 ${githubConnected ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-muted text-muted-foreground'}`}>
               {githubConnected ? 'Connected' : 'Not set'}
             </span>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 sm:p-4 bg-muted/50 rounded-lg">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <Code2 className="w-5 sm:w-6 h-5 sm:h-6 text-muted-foreground flex-shrink-0" />
+              <Code2 className="w-5 sm:w-6 h-5 sm:h-6 text-muted-foreground shrink-0" />
               <div className="min-w-0">
                 <p className="text-sm sm:text-base font-medium text-foreground">LeetCode</p>
                 <p className="text-xs sm:text-sm text-muted-foreground truncate">{leetcodeConnected ? `${profile.leetcodeUsername}` : 'Add username in Profile'}</p>
               </div>
             </div>
-            <span className={`px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded-full whitespace-nowrap flex-shrink-0 ${leetcodeConnected ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-muted text-muted-foreground'}`}>
+            <span className={`px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium rounded-full whitespace-nowrap shrink-0 ${leetcodeConnected ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-muted text-muted-foreground'}`}>
               {leetcodeConnected ? 'Connected' : 'Not set'}
             </span>
           </div>

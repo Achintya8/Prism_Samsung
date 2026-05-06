@@ -11,6 +11,7 @@ import {
 import "./globals.css";
 import { COLOR_THEME_STORAGE_KEY } from "@/lib/color-theme";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { QueryProvider } from "@/components/providers/query-provider";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -73,15 +74,17 @@ export default function RootLayout({
             __html: `(function(){try{var k=${JSON.stringify(COLOR_THEME_STORAGE_KEY)};var v=localStorage.getItem(k);if(v&&v!=="default")document.documentElement.setAttribute("data-color-theme",v)}catch(e){}})()`,
           }}
         />
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <main className="flex-1 w-full flex flex-col">{children}</main>
-          <Toaster richColors position="bottom-right" />
-        </ThemeProvider>
+        <QueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <main className="flex-1 w-full flex flex-col">{children}</main>
+            <Toaster richColors position="bottom-right" />
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );
