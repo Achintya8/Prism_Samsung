@@ -3,15 +3,15 @@
 import { Calendar as CalendarIcon, Loader2, Dumbbell, Route, Code, SearchCode, BookOpen, Presentation } from "lucide-react";
 import { useEffect, useState } from 'react'
 import { Calendar, CalendarDayButton } from "@/components/ui/calendar"
-
-type ActivityEvent = {
-  id: string
-  type: 'github' | 'leetcode' | 'gym' | 'jogging' | 'study' | 'project'
-  title: string
-  date: string
-  points: number
-  details: string
-}
+import {ActivityEvent} from "@/types"
+// type ActivityEvent = {
+//   id: string
+//   type: 'github' | 'leetcode' | 'gym' | 'jogging' | 'study' | 'project'
+//   title: string
+//   date: string
+//   points: number
+//   details: string
+// }
 
 function getActivityIcon(type: string) {
   switch (type) {

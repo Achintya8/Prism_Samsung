@@ -2,37 +2,38 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Plus, Code2, RefreshCcw, X } from "lucide-react";
-import { GithubIcon } from "./icons/GithubIcon";
+import { GithubIcon } from "../icons/GithubIcon";
 import { ActivityCard } from "./ActivityCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import {Activity, Profile, ActivityOption} from "@/types";
 
-type ActivityType = 'github' | 'leetcode' | 'gym' | 'jogging' | 'study' | 'project'
+// type ActivityType = 'github' | 'leetcode' | 'gym' | 'jogging' | 'study' | 'project'
 
-type Activity = {
-  id: string
-  type: ActivityType
-  title: string
-  date: string
-  points: number
-  details?: string
-}
+// type Activity = {
+//   id: string
+//   type: ActivityType
+//   title: string
+//   date: string
+//   points: number
+//   details?: string
+// }
 
-type Profile = {
-  githubUsername: string
-  leetcodeUsername: string
-  githubContributions: number
-  githubPublicRepos: number
-  githubFollowers: number
-  leetcodeSolved: number
-  lastPlatformSyncAt: string | null
-}
+// type Profile = {
+//   githubUsername: string
+//   leetcodeUsername: string
+//   githubContributions: number
+//   githubPublicRepos: number
+//   githubFollowers: number
+//   leetcodeSolved: number
+//   lastPlatformSyncAt: string | null
+// }
 
-type ActivityOption = {
-  label: string
-  type: ActivityType
-  defaultValue: number
-  unit: string
-}
+// type ActivityOption = {
+//   label: string
+//   type: ActivityType
+//   defaultValue: number
+//   unit: string
+// }
 
 const activityOptions: ActivityOption[] = [
   { label: 'Gym Session', type: 'gym', defaultValue: 1, unit: 'session' },

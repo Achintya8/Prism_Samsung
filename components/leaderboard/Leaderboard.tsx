@@ -3,17 +3,17 @@
 import { useEffect, useState } from 'react'
 import { Medal, Trophy, RefreshCcw } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-
-type LeaderboardEntry = {
-  userId?: string
-  rank: number
-  name: string
-  totalPoints: number
-  currentStreak: number
-  department?: string
-  avatar: string
-  isCurrentUser: boolean
-}
+import {LeaderboardEntry} from "@/types"
+// type LeaderboardEntry = {
+//   userId?: string
+//   rank: number
+//   name: string
+//   totalPoints: number
+//   currentStreak: number
+//   department?: string
+//   avatar: string
+//   isCurrentUser: boolean
+// }
 
 function field(record: Record<string, unknown>, key: string) {
   return record[key]

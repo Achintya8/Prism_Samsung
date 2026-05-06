@@ -1,10 +1,8 @@
 import { Code2, Dumbbell, Footprints, BookOpen, Briefcase } from "lucide-react";
-import { GithubIcon } from "./icons/GithubIcon";
-import type { Activity } from "@/types";
+import { GithubIcon } from "../icons/GithubIcon";
+import type { ActivityCardProps} from "@/types";
 
-interface ActivityCardProps {
-  activity: Activity;
-}
+
 
 export function ActivityCard({ activity }: ActivityCardProps) {
   const getIcon = () => {

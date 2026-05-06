@@ -11,14 +11,14 @@ import {
   BrainCircuit,
   ArrowRight,
 } from "lucide-react";
-import { GithubIcon } from "./icons/GithubIcon";
+import { GithubIcon } from "../icons/GithubIcon";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { ActivityHeatmap } from "./ActivityHeatmap";
-const StreakDisplay = dynamic(() => import('./StreakDisplay').then(m => ({ default: m.StreakDisplay })), { ssr: false })
-import { ActivityCard } from "./ActivityCard";
-import { Leaderboard } from './Leaderboard'
-import { ClawMind } from './ClawMind'
+import { ActivityHeatmap } from "../activity/ActivityHeatmap";
+const StreakDisplay = dynamic(() => import('../streak/StreakDisplay').then(m => ({ default: m.StreakDisplay })), { ssr: false })
+import { ActivityCard } from "../activity/ActivityCard";
+// import { Leaderboard } from '../leaderboard/Leaderboard'
+// import { ClawMind } from '../study/ClawMind'
 import { Skeleton } from "@/components/ui/skeleton";
 
 const statSurface =

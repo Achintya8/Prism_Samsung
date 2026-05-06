@@ -1,5 +1,5 @@
 import { NavBar } from "@/components/navbar/navbar";
-import { OnboardingTour } from "@/components/OnboardingTour";
+import { OnboardingTour } from "@/components/tour/OnboardingTour";
 
 export default function SharedLayout({ children }: { children: React.ReactNode }) {
   return (
