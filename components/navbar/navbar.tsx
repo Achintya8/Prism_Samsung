@@ -11,14 +11,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "../ui/sheet";
-import { Home, Trophy, Activity, User, MessageCircle, HelpCircle, LogOut, Settings, LoaderIcon, MessageSquare, Book, Menu } from "lucide-react";
+  Home,
+  Trophy,
+  Activity,
+  User,
+  MessageCircle,
+  HelpCircle,
+  LogOut,
+  Settings,
+  LoaderIcon,
+  MessageSquare,
+  Book,
+  Menu,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { ToggleColorTheme } from "./toggle-color-theme";
@@ -84,7 +91,7 @@ export function NavBar() {
       <div>
         <Link href={session ? "/dashboard" : "/"} className="flex items-center gap-2">
           <Activity className="size-6 lg:size-7 text-blue-500" />
-          <span className="text-xl lg:text-2xl font-bold tracking-tight">ProductivityHub</span>
+          <span className="text-xl lg:text-2xl font-bold tracking-tight">ClawMind</span>
         </Link>
       </div>
 
@@ -122,10 +129,7 @@ export function NavBar() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative size-9 rounded-full">
                     <Avatar className="size-9">
-                      <AvatarImage
-                        src={session.user.image || undefined}
-                        alt={session.user.name}
-                      />
+                      <AvatarImage src={session.user.image || undefined} alt={session.user.name} />
                       <AvatarFallback className="text-xs">
                         {getInitials(session.user.name)}
                       </AvatarFallback>
@@ -150,10 +154,7 @@ export function NavBar() {
                       Settings
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={handleReplayTour}
-                    className="cursor-pointer"
-                  >
+                  <DropdownMenuItem onClick={handleReplayTour} className="cursor-pointer">
                     <HelpCircle className="mr-2 size-4" />
                     Replay Page Tour
                   </DropdownMenuItem>
@@ -194,9 +195,7 @@ export function NavBar() {
                       </Avatar>
                       <div className="flex flex-col">
                         <span className="text-sm font-medium">{session.user.name}</span>
-                        <span className="text-xs text-muted-foreground">
-                          {session.user.email}
-                        </span>
+                        <span className="text-xs text-muted-foreground">{session.user.email}</span>
                       </div>
                     </div>
                   </SheetTitle>
@@ -234,7 +233,10 @@ export function NavBar() {
                     Settings
                   </Link>
                   <button
-                    onClick={() => { setMobileOpen(false); handleReplayTour(); }}
+                    onClick={() => {
+                      setMobileOpen(false);
+                      handleReplayTour();
+                    }}
                     className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground w-full text-left"
                   >
                     <HelpCircle className="size-4" />

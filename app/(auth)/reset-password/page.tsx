@@ -10,12 +10,26 @@ import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { getResetPasswordErrorMessage } from "@/errors/auth";
 import { CheckCircle, Eye, EyeOff, LoaderIcon } from "lucide-react";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import z from "zod";
 
 export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex w-full max-w-md items-center justify-center px-6 py-16">
+          <LoaderIcon className="size-5 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
+      <ResetPasswordForm />
+    </Suspense>
+  );
+}
+
+function ResetPasswordForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [isReset, setIsReset] = useState(false);
   const [showPassword, setShowPassword] = useState(false);

@@ -26,6 +26,8 @@ export interface IUser extends Document {
   geminiKey?: string;
   githubPat?: string;
   leetcodePat?: string;
+  emailVerified?: boolean;
+  image?: string;
 }
 
 const UserSchema = new Schema<IUser>(
