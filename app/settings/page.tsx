@@ -311,8 +311,12 @@ export default function SettingsPage() {
         throw new Error(data?.message || "Failed to delete account");
       }
 
+      // Drop any client-side session state before redirect; ignore failures since
+      // the server already invalidated the session by clearing cookies.
+      await authClient.signOut().catch(() => {});
+
       toast.success("Account deleted. We're sorry to see you go.");
-      window.location.href = "/login";
+      window.location.replace("/login");
     } catch (error) {
       toast.error(
         error instanceof Error ? error.message : "Failed to delete account. Please try again.",
