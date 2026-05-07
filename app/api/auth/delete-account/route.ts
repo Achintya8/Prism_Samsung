@@ -51,9 +51,11 @@ export async function POST() {
     await db.collection("user").deleteOne({ _id: userObjectId });
 
     const response = NextResponse.json({ ok: true });
-    // Clear better-auth session cookies so the client is signed out immediately.
-    response.cookies.delete("better-auth.session_token");
-    response.cookies.delete("__Secure-better-auth.session_token");
+    // Better-auth sets the session cookie with path=/, so an expired Set-Cookie
+    // with the same path is the only reliable way to clear it from the browser.
+    const expire = { path: "/", expires: new Date(0), maxAge: 0 } as const;
+    response.cookies.set("better-auth.session_token", "", expire);
+    response.cookies.set("__Secure-better-auth.session_token", "", { ...expire, secure: true });
     return response;
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to delete account";
