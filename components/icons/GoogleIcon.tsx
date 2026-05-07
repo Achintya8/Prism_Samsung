@@ -1,5 +1,6 @@
 import * as React from "react";
 
+// This Google mark is embedded directly so sign-in buttons can render without extra assets.
 export function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}>

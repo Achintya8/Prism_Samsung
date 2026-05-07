@@ -1,5 +1,6 @@
 import mongoose, { Document, Model, Schema } from 'mongoose';
 
+// Notes and whiteboards live inside a subject because the study area is organized around topics.
 export interface INote {
   _id?: mongoose.Types.ObjectId;
   title: string;
@@ -30,6 +31,7 @@ export interface ISubject extends Document {
   whiteboards: IWhiteboard[];
 }
 
+// Nested note records keep generated content grouped with the subject it belongs to.
 const NoteSchema = new Schema<INote>({
   title: { type: String, required: true },
   content: { type: String },
@@ -45,12 +47,14 @@ const NoteSchema = new Schema<INote>({
   ],
 });
 
+// Whiteboards are stored alongside notes so a subject can hold both text and visual study aids.
 const WhiteboardSchema = new Schema<IWhiteboard>({
   title: { type: String },
   image: { type: String, required: true },
   createdDate: { type: Date, default: Date.now },
 });
 
+// The subject document is the parent container for study notes and generated whiteboards.
 const SubjectSchema = new Schema<ISubject>(
   {
     userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
@@ -63,7 +67,7 @@ const SubjectSchema = new Schema<ISubject>(
   { timestamps: true }
 );
 
-// Pre-save middleware to update notesCount
+// Keep the note counter in sync automatically so the UI never has to recalculate it.
 SubjectSchema.pre('save', async function () {
   if (this.notes) {
     this.notesCount = this.notes.length;

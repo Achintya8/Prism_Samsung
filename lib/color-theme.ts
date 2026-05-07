@@ -1,5 +1,6 @@
 export const COLOR_THEME_STORAGE_KEY = "ph-color-theme";
 
+// The theme ids are centralized so the picker, storage, and DOM attribute all share the same vocabulary.
 export const COLOR_THEME_IDS = [
   "default",
   "catppuccin",
@@ -20,6 +21,7 @@ export const COLOR_THEME_OPTIONS: { id: ColorThemeId; label: string }[] = [
   { id: "amethyst-haze", label: "Amethyst Haze" },
 ];
 
+// Apply the selected theme to the document and persist it so the choice survives refreshes.
 export function applyColorTheme(id: ColorThemeId) {
   const root = document.documentElement;
   if (id === "default") {
@@ -39,6 +41,7 @@ export function applyColorTheme(id: ColorThemeId) {
   }
 }
 
+// Read the saved theme from storage, but fall back cleanly when nothing was stored yet.
 export function readStoredColorTheme(): ColorThemeId {
   try {
     const v = localStorage.getItem(COLOR_THEME_STORAGE_KEY);

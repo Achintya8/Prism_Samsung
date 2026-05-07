@@ -4,6 +4,7 @@ import { driver } from "driver.js";
 import "driver.js/dist/driver.css";
 import { usePathname, useRouter } from "next/navigation";
 
+// The onboarding tour teaches the app in small, page-specific steps instead of dumping everything at once.
 export const TOUR_KEY = "tour_v1";   // bump to reset for all users
 const TOUR_ACTIVE = "tour_active";   // "true" while tour is running
 const TOUR_PAGE_IDX = "tour_page_idx"; // index into TOUR_FLOW
@@ -130,7 +131,7 @@ const TOUR_FLOW: {
   },
 ];
 
-// ── helpers ──────────────────────────────────────────────────────────────────
+// These helpers keep the tour state readable in localStorage without spreading storage logic through the component.
 function isFirstVisit() {
   return !localStorage.getItem(TOUR_KEY);
 }
@@ -151,7 +152,7 @@ function setTourState(active: boolean, pageIdx: number) {
   }
 }
 
-// ── component ────────────────────────────────────────────────────────────────
+// The component itself does not render visible UI; it just drives the walkthrough when the page is ready.
 export function OnboardingTour() {
   const pathname = usePathname();
   const router = useRouter();
@@ -161,6 +162,7 @@ export function OnboardingTour() {
       const page = TOUR_FLOW[pageIdx];
       if (!page) return;
 
+      // Each page owns its own steps so the tour stays aligned with the actual screen the user sees.
       const steps = page.steps();
       const isLastPage = pageIdx === TOUR_FLOW.length - 1;
       let completedNaturally = false;
@@ -212,9 +214,9 @@ export function OnboardingTour() {
     [router]
   );
 
-  // Effect 1 — auto-start on first visit, or resume when navigated here by the tour
+  // Auto-start on the first visit, or resume when the tour navigates the user between pages.
   useEffect(() => {
-    // First-ever visit: kick off from the beginning
+    // The very first visit should start on the dashboard because that is where the app story begins.
     if (isFirstVisit()) {
       const t = setTimeout(() => {
         if (pathname === TOUR_FLOW[0].path) {
@@ -228,7 +230,7 @@ export function OnboardingTour() {
       return () => clearTimeout(t);
     }
 
-    // Tour is active and we just landed on the right page — run the steps
+    // If the tour is already active, wait for the correct page before showing the next set of tips.
     if (isTourActive()) {
       const idx = getTourPageIdx();
       if (TOUR_FLOW[idx]?.path === pathname) {
@@ -238,15 +240,15 @@ export function OnboardingTour() {
     }
   }, [pathname, router, runTourForPage]);
 
-  // Effect 2 — always listen for the replay event (never returns early)
+  // The replay listener lets the navbar restart the tour without coupling the two components.
   useEffect(() => {
     function handleReplay() {
       setTourState(true, 0);
       if (pathname === TOUR_FLOW[0].path) {
-        // Already on dashboard — run immediately
+        // Already on the starting page, so the tour can begin right away.
         runTourForPage(0);
       } else {
-        // Navigate to dashboard; Effect 1 will pick it up on arrival
+        // Navigate back to the start and let the first effect resume the walkthrough.
         router.push(TOUR_FLOW[0].path);
       }
     }

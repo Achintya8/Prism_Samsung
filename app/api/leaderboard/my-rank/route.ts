@@ -4,7 +4,7 @@ import { auth } from '@/lib/auth'
 import connectToDB from '@/lib/mongodb'
 import { User } from '@/lib/models/User'
 
-// Fast endpoint to get just the current user's rank
+// This endpoint is a lightweight shortcut for showing the signed-in user's own leaderboard position.
 export async function GET(request: Request) {
   const session = await auth.api.getSession({ headers: await headers() })
   
@@ -15,7 +15,7 @@ export async function GET(request: Request) {
   try {
     await connectToDB()
     
-    // Get current user's points
+    // Pull only the fields needed for rank calculation to keep the query cheap.
     const currentUser = await User.findById(session.user.id)
       .select('name totalPoints currentStreak email')
       .lean()
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 })
     }
 
-    // Count how many users have more points (for rank calculation)
+    // Rank is just the number of users ahead of this one plus one.
     const rankCount = await User.countDocuments({
       totalPoints: { $gt: currentUser.totalPoints || 0 }
     })

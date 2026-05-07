@@ -1,5 +1,6 @@
 import mongoose, { Document, Model, Schema } from 'mongoose';
 
+// This interface describes the user record shape that all auth, profile, and scoring code relies on.
 export interface IUser extends Document {
   name: string;
   email: string;
@@ -59,7 +60,7 @@ const UserSchema = new Schema<IUser>(
   { timestamps: true, collection: 'user' }
 );
 
-// Index for leaderboard queries: sort by totalPoints (desc), then createdAt (asc)
+  // The leaderboard query sorts by points first, then creation time, so this index keeps that path fast.
 UserSchema.index({ totalPoints: -1, createdAt: 1 });
 
 export const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);

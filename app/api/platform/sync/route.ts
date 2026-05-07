@@ -11,42 +11,51 @@ import { recalculateAllStreaks } from '@/lib/streak'
 import { decrypt } from '@/lib/encryption'
 import { db } from '@/db'
 
+// This endpoint pulls the user's external activity into our local database.
+// Keeping the flow inside one route makes sync predictable and easy to audit.
 export async function POST(request: Request) {
+  // Only signed-in users are allowed to trigger a sync.
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session?.user?.id) {
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
   }
 
+  // We need the database connection before we can read or update the profile.
   await connectToDB()
   const user = await User.findById(session.user.id)
   if (!user) {
     return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 })
   }
 
+  // Snapshot stores the latest data pulled from each platform during this run.
   const snapshot: PlatformSnapshot = {}
+  // Errors are collected instead of failing fast so one broken provider does not block the other.
   const errors: string[] = []
+  // Results are returned to the caller so the UI can explain what actually happened.
   const results: Array<{ provider: 'github' | 'leetcode'; ok: boolean; message: string }> = []
 
-  // If user doesn't have GitHub username saved but has GitHub linked, try to extract it from OAuth
+  // If the profile does not already store a GitHub username, try to recover it from the linked OAuth account.
   let githubUsername = user.githubUsername
   if (!githubUsername) {
     try {
-      // Query better-auth's accounts collection for GitHub account
+      // Better Auth keeps linked accounts in a separate collection, so we check there first.
       const accountsCollection = db.collection('account')
       const githubAccount = await accountsCollection.findOne({ userId: user._id.toString(), provider: 'github' })
       if (githubAccount?.accountId) {
-        // accountId for GitHub contains the username
+        // For GitHub, accountId is the username we want to sync with.
         githubUsername = githubAccount.accountId
-        // Save it to user for future syncs
+        // Save it now so future syncs do not need to rediscover it.
         user.githubUsername = githubUsername
       }
     } catch (e) {
-      // continue without GitHub username
+      // If account lookup fails, we still let the rest of the sync continue.
     }
   }
 
+  // GitHub sync only runs when we have a username to target.
   if (githubUsername) {
     try {
+      // Decrypt the PAT only when we actually need it, so we keep secrets out of memory for as short a time as possible.
       const pat = user.githubPat ? decrypt(user.githubPat) : undefined
       snapshot.github = await fetchGitHubSnapshot(githubUsername, pat)
       console.log(`[Sync] GitHub: ${githubUsername}`, {
@@ -67,8 +76,10 @@ export async function POST(request: Request) {
     }
   }
 
+  // LeetCode sync follows the same pattern, but only runs when a username exists on the profile.
   if (user.leetcodeUsername) {
     try {
+      // The optional token unlocks private history; without it we only read public data.
       const leetToken = user.leetcodePat ? decrypt(user.leetcodePat) : undefined
       snapshot.leetcode = await fetchLeetCodeSnapshot(user.leetcodeUsername, leetToken)
       console.log(`[Sync] LeetCode: ${user.leetcodeUsername}`, {
@@ -88,6 +99,7 @@ export async function POST(request: Request) {
     }
   }
 
+  // If no platform names are stored, there is nothing useful to sync yet.
   if (!githubUsername && !user.leetcodeUsername) {
     return NextResponse.json({
       ok: false,
@@ -102,7 +114,7 @@ export async function POST(request: Request) {
   let pointsDelta = 0
   let historyUpdated = false
 
-  // Helper to process history — user is guaranteed non-null at this point
+  // This helper turns per-day history into dated Activity records and daily streak logs.
   const userId = user._id
   async function processHistory(
     history: Record<string, number>,
@@ -111,15 +123,17 @@ export async function POST(request: Request) {
     titleFn: (count: number) => string,
     details: string
   ) {
+    // Each day is handled independently so retries can safely update one record at a time.
     console.log(`[processHistory] Starting for ${type}, total days: ${Object.keys(history).length}`)
     for (const [dateStr, count] of Object.entries(history)) {
       if (count <= 0) continue
 
+      // Normalize the day range so a contribution always lands on the correct calendar date.
       const startOfDay = new Date(`${dateStr}T00:00:00.000Z`)
       const endOfDay = new Date(`${dateStr}T23:59:59.999Z`)
       const expectedPoints = pointsFor(pointType, count)
 
-      // Try atomic upsert: create the activity if missing. updateOne with upsert
+      // Use an upsert so we create the activity once and avoid duplicate records on repeat syncs.
       const filter = {
         userId: userId,
         type,
@@ -141,11 +155,10 @@ export async function POST(request: Request) {
         { upsert: true }
       )
 
-      // If we inserted a new activity, upsertResult.upsertedCount will be > 0
-      // (Mongoose returns a WriteResult-like object)
-      // Award points and mark daily log atomically.
-      // @ts-ignore - depending on driver, upsertedCount may be available
+      // A fresh insert means this activity has never been counted before.
+      // @ts-ignore - depending on the driver version, upsertedCount may be exposed differently.
       if (upsertResult && (upsertResult as any).upsertedCount > 0) {
+        // The daily log is what powers streaks, so we keep it in step with the new activity.
         await DailyActivityLog.findOneAndUpdate(
           { userId: userId.toString(), date: dateStr },
           { $set: { hasActivity: true }, $inc: { totalCount: count } },
@@ -154,7 +167,7 @@ export async function POST(request: Request) {
         pointsDelta += expectedPoints
         historyUpdated = true
       } else {
-        // Existing activity: load and update if they did more than before
+        // If the day already exists, only increase the score when the new history shows more work than before.
         const existing = await Activity.findOne(filter)
         if (existing) {
           const previousPoints = existing.points
@@ -162,8 +175,10 @@ export async function POST(request: Request) {
             const addedPoints = expectedPoints - previousPoints
             const addedCount = count - Math.floor(previousPoints / pointsFor(pointType, 1))
 
+            // Refresh the visible activity text so the title matches the newer total.
             await Activity.updateOne({ _id: existing._id }, { $set: { points: expectedPoints, title: titleFn(count) } })
 
+            // Keep the daily total honest so streak math stays aligned with activity history.
             await DailyActivityLog.updateOne(
               { userId: userId.toString(), date: dateStr },
               { $inc: { totalCount: addedCount } }
@@ -176,6 +191,7 @@ export async function POST(request: Request) {
     }
   }
 
+  // GitHub data gets copied back onto the profile before its history is converted into Activity rows.
   if (snapshot.github) {
     user.githubUsername = snapshot.github.username
     user.avatarUrl = snapshot.github.avatarUrl || user.avatarUrl
@@ -192,6 +208,7 @@ export async function POST(request: Request) {
     )
   }
 
+  // LeetCode follows the same shape: keep the profile summary fresh, then persist the dated history.
   if (snapshot.leetcode) {
     user.leetcodeUsername = snapshot.leetcode.username
     if (!user.avatarUrl && snapshot.leetcode.avatarUrl) user.avatarUrl = snapshot.leetcode.avatarUrl
@@ -209,24 +226,26 @@ export async function POST(request: Request) {
     )
   }
 
+  // When history changes, recompute streaks from the log instead of trying to patch streak counts by hand.
   if (historyUpdated) {
-    // Recalculate streak from logs
     const dailyLogs = await DailyActivityLog.find({ userId: user._id }).lean()
     const mappedLogs = dailyLogs.map((log) => ({
       date: log.date,
       hasActivity: log.hasActivity
     }))
-    
+
     const { currentStreak, bestStreak } = recalculateAllStreaks(mappedLogs)
 
     user.currentStreak = currentStreak
     user.longestStreak = bestStreak
   }
 
+  // The total points reflect everything we newly awarded during this sync run.
   user.totalPoints += pointsDelta
   user.lastPlatformSyncAt = new Date()
   await user.save()
 
+  // Return the snapshot and per-provider result list so the client can explain the outcome clearly.
   return NextResponse.json({
     ok: errors.length === 0 || Boolean(snapshot.github || snapshot.leetcode),
     snapshot,

@@ -13,11 +13,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
 
+// The forgot-password page is a recovery path, so it stays simple and keeps the user focused on one input.
 export default function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState("");
 
+  // Only the email field is needed here because the reset link is sent out-of-band.
   const form = useForm<z.infer<typeof forgotPasswordSchema>>({
     resolver: zodResolver(forgotPasswordSchema as any),
     defaultValues: {
@@ -25,6 +27,7 @@ export default function ForgotPasswordPage() {
     },
   });
 
+  // Submitting this form triggers the password reset email and swaps the page into a confirmation state.
   const onSubmit = async (data: z.infer<typeof forgotPasswordSchema>) => {
     setIsLoading(true);
     try {
@@ -59,6 +62,7 @@ export default function ForgotPasswordPage() {
   if (isSubmitted) {
     return (
       <div className="w-full max-w-md px-6">
+        {/* The success state reassures the user that the request worked before they leave the page. */}
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
             <CheckCircle className="size-8 text-green-600 dark:text-green-400" />
@@ -107,10 +111,10 @@ export default function ForgotPasswordPage() {
         </p>
       </div>
 
-      {/* Form */}
+      {/* The form is intentionally short so the user can recover access with minimal friction. */}
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup className="gap-3">
-          {/* Email */}
+          {/* The email field is the only data the reset flow needs. */}
           <Controller
             name="email"
             control={form.control}
@@ -132,7 +136,7 @@ export default function ForgotPasswordPage() {
             )}
           />
 
-          {/* Submit Button */}
+          {/* The button is the primary action because everything else on the page is supportive. */}
           <Button
             type="submit"
             disabled={isLoading}
@@ -143,7 +147,7 @@ export default function ForgotPasswordPage() {
         </FieldGroup>
       </form>
 
-      {/* Back to login */}
+      {/* This link gives the user an easy exit if they reached the page by mistake. */}
       <p className="mt-6 text-center text-sm text-muted-foreground">
         Remember your password?{" "}
         <Link

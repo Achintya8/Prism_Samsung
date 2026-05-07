@@ -24,6 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 const statSurface =
   "rounded-xl border border-border bg-card p-4 text-card-foreground shadow-sm ring-1 ring-foreground/10";
 
+// The dashboard pulls together the headline metrics, recent activity, and the main product shortcuts.
 export function Dashboard() {
   const [stats, setStats] = useState({
     totalPoints: 0,
@@ -40,6 +41,7 @@ export function Dashboard() {
   const [activities, setActivities] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
+  // Load both the summary stats and the recent feed together so the page can hydrate as one coherent view.
   useEffect(() => {
     async function load() {
       setIsLoading(true)
@@ -69,6 +71,7 @@ export function Dashboard() {
     load()
   }, [])
 
+  // Skeletons keep the layout stable while data is loading so the page does not jump around.
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 pb-20 md:pb-6 space-y-4 sm:space-y-6">
@@ -97,7 +100,7 @@ export function Dashboard() {
 
   return (
     <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 pb-20 md:pb-6">
-      {/* ClawMind Feature Card */}
+      {/* The ClawMind card is a shortcut into the AI study tools because it is one of the main value props. */}
       <Link href="/study" className="block mb-4 sm:mb-6">
         <div className="bg-linear-to-r from-indigo-600 to-purple-600 rounded-xl p-4 sm:p-6 text-white hover:shadow-lg transition-shadow">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -117,7 +120,7 @@ export function Dashboard() {
         </div>
       </Link>
 
-      {/* Stats Overview */}
+      {/* These top metrics answer the user's first question: how am I doing overall? */}
       <div id="tour-dashboard-stats" className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 mb-4 sm:mb-6">
         <div className={statSurface}>
           <div className="flex items-center gap-2 mb-2">
@@ -168,7 +171,7 @@ export function Dashboard() {
         </div>
       </div>
 
-      {/* Frequent Activities */}
+      {/* Frequent activities highlight the user's most common effort so progress is easier to spot. */}
       {(() => {
         const freqStats = [
           { id: 'github', label: 'GitHub', value: stats.githubContributions, unit: 'commits', icon: GithubIcon, colorClass: 'text-gray-700 dark:text-gray-300', url: stats.githubUsername ? `https://github.com/${stats.githubUsername}` : null },
@@ -207,19 +210,13 @@ export function Dashboard() {
         );
       })()}
 
-      {/* Streak Display */}
-      {/* <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6"> */}
+      {/* The streak and heatmap area gives a visual history of consistency, not just totals. */}
       <div id="tour-streak-calendar" className="lg:col-span-2">
         <StreakDisplay />
         <ActivityHeatmap />
       </div>
-      {/* <div className="lg:col-span-1">
-          <Leaderboard />
-          <ClawMind />
-        </div> */}
-      {/* </div> */}
 
-      {/* Recent Activities */}
+      {/* Recent activity cards make the dashboard feel current instead of summary-only. */}
       {activities.length > 0 && (
         <div className="rounded-xl border border-border bg-card p-4 sm:p-6 text-card-foreground shadow-sm ring-1 ring-foreground/10 mt-4 sm:mt-6">
           <h2 className="text-base sm:text-lg font-semibold text-foreground mb-4">Recent Activities</h2>

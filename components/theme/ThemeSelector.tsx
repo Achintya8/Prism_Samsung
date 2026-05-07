@@ -5,6 +5,7 @@ import { useTheme } from "next-themes";
 import { COLOR_THEME_OPTIONS, applyColorTheme, readStoredColorTheme, ColorThemeId } from "@/lib/color-theme";
 import { Palette, Moon, Sun, Monitor } from "lucide-react";
 
+// The theme selector combines color palettes and light/dark mode in one compact popover.
 export function ThemeSelector() {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
@@ -17,6 +18,7 @@ export function ThemeSelector() {
   }, []);
 
   const handleColorChange = (id: ColorThemeId) => {
+    // Persist the choice and update the DOM immediately so the change feels instant.
     applyColorTheme(id);
     setColorTheme(id);
   };
@@ -33,6 +35,7 @@ export function ThemeSelector() {
         <Palette className="w-5 h-5" />
       </button>
 
+      {/* The popover stays open only when the user explicitly asks for theme controls. */}
       {isOpen && (
         <>
           <div

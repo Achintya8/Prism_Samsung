@@ -53,6 +53,7 @@ const emptyProfile: Profile = {
   lastPlatformSyncAt: null,
 }
 
+// The activities page is the user's control panel for manual logs and platform sync.
 export function Activities() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -66,6 +67,7 @@ export function Activities() {
   const [syncing, setSyncing] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
 
+  // Manual logs and live profile data are loaded together so the page always reflects the latest state.
   const loadActivities = useCallback(async () => {
     const response = await fetch('/api/activities?limit=50');
     if (!response.ok) return;
@@ -75,6 +77,7 @@ export function Activities() {
     }
   }, []);
 
+  // The profile snapshot tells the page whether GitHub or LeetCode can be synced automatically.
   const loadProfile = useCallback(async () => {
     const response = await fetch('/api/profile');
     if (!response.ok) return;
@@ -92,10 +95,12 @@ export function Activities() {
     }
   }, []);
 
+  // Keep fetching logic in one place so manual refreshes and auto-sync updates use the same data shape.
   const loadPageData = useCallback(async () => {
     await Promise.all([loadActivities(), loadProfile()]);
   }, [loadActivities, loadProfile]);
 
+  // The first load is separate so the page can show a stable skeleton before any requests resolve.
   const loadInitialPageData = useCallback(async () => {
     setInitialLoading(true);
     try {
@@ -105,8 +110,10 @@ export function Activities() {
     }
   }, [loadPageData]);
 
+  // Sync only runs when at least one platform is connected, otherwise the request would have nothing to do.
   const hasConnectedPlatform = Boolean(profile.githubUsername || profile.leetcodeUsername);
 
+  // Auto-sync quietly refreshes connected platform data on a timer without requiring a manual click.
   const autoSyncQuery = useQuery({
     queryKey: ["platform-sync-auto", profile.githubUsername, profile.leetcodeUsername],
     queryFn: async () => {
@@ -125,30 +132,35 @@ export function Activities() {
   });
 
   useEffect(() => {
+    // A successful platform sync should refresh the screen and emit the shared activity event.
     if (!autoSyncQuery.data) return;
     window.dispatchEvent(new Event('activity:logged'));
     void loadPageData();
   }, [autoSyncQuery.data, loadPageData]);
 
   useEffect(() => {
+    // Defer the first load by one tick so the browser paints the skeleton first.
     const id = window.setTimeout(() => {
       void loadInitialPageData();
     }, 0);
     return () => window.clearTimeout(id);
   }, [loadInitialPageData]);
 
+  // Picking an option updates the form defaults so the value and unit stay aligned.
   function chooseOption(option: ActivityOption) {
     setSelectedOption(option);
     setValue(String(option.defaultValue));
     setCustomTitle('');
   }
 
+  // The manual activity form converts a small user input into a durable logged event.
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const numericValue = Number(value);
     if (!selectedOption || !Number.isFinite(numericValue) || numericValue <= 0) return;
 
     setLoading(true);
+  // The sync button gives the user an explicit way to pull fresh GitHub and LeetCode data on demand.
     setStatus('');
     try {
       const response = await fetch('/api/activities', {
@@ -217,6 +229,7 @@ export function Activities() {
 
   return (
     <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-8 py-4 sm:py-6 pb-20 md:pb-6">
+      {/* The header gives a fast summary and a single obvious entry point for adding new work. */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
         <div>
           <h1 className="text-xl sm:text-2xl font-semibold text-foreground">Activities</h1>
@@ -234,6 +247,7 @@ export function Activities() {
         </button>
       </div>
 
+      {/* The add form stays collapsed until the user chooses to log something new. */}
       {showAddForm && (
         <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 mb-6">
           <h2 className="text-base sm:text-lg font-semibold text-foreground mb-4">Log Activity</h2>
@@ -306,6 +320,7 @@ export function Activities() {
         </div>
       )}
 
+      {/* Connected platforms are grouped here because they explain where automated points come from. */}
       <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6 mb-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
           <h2 className="text-base sm:text-lg font-semibold text-foreground">Connected Platforms</h2>
@@ -348,6 +363,7 @@ export function Activities() {
         {profile.lastPlatformSyncAt && <p className="text-[11px] sm:text-xs text-muted-foreground mt-3">Last synced {new Date(profile.lastPlatformSyncAt).toLocaleString()}</p>}
       </div>
 
+      {/* The history list closes the loop by showing everything the user has already logged. */}
       <div className="bg-card rounded-xl shadow-sm border border-border p-4 sm:p-6">
         <h2 className="text-base sm:text-lg font-semibold text-foreground mb-4">Activity History</h2>
         <div className="space-y-3">

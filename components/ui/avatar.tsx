@@ -5,6 +5,7 @@ import { Avatar as AvatarPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
 
+// Avatars are shared across the navbar, profile page, and leaderboard, so the defaults live in one place.
 function Avatar({
   className,
   size = "default",
@@ -57,6 +58,7 @@ function AvatarFallback({
   )
 }
 
+// Badges and groups keep multi-avatar layouts readable when an area needs more than one profile image.
 function AvatarBadge({ className, ...props }: React.ComponentProps<"span">) {
   return (
     <span

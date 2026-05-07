@@ -34,6 +34,7 @@ type LeetCodeMatchedUser = {
     }
   }
 
+// The platform snapshot is the normalized shape the rest of the app understands.
 export type PlatformSnapshot = {
   github?: {
     username: string
@@ -58,15 +59,18 @@ export type PlatformSnapshot = {
   }
 }
 
+// Small guard so fetch failures read like service errors instead of generic network noise.
 function assertOk(response: Response, service: string) {
   if (!response.ok) {
     throw new Error(`${service} returned ${response.status}`)
   }
 }
 
+// GitHub GraphQL is only used when we have a token, because it gives the cleanest day-by-day contribution history.
 async function fetchGitHubGraphQLHistory(username: string, pat: string): Promise<Record<string, number>> {
   const history: Record<string, number> = {}
   try {
+    // GitHub's contribution calendar only needs the last year, so we keep the window tight.
     const now = new Date()
     const from = new Date(now.getFullYear(), now.getMonth() - 11, 1).toISOString()
     const to = now.toISOString()
@@ -114,8 +118,10 @@ async function fetchGitHubGraphQLHistory(username: string, pat: string): Promise
   return history
 }
 
+// Build a single GitHub snapshot so the caller does not need to merge REST and GraphQL details itself.
 export async function fetchGitHubSnapshot(username: string, pat?: string) {
   const cleanUsername = username.trim()
+  // The public REST API gives us profile basics even when no token is available.
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github+json',
     'X-GitHub-Api-Version': '2022-11-28',
@@ -133,13 +139,13 @@ export async function fetchGitHubSnapshot(username: string, pat?: string) {
   let recentContributions = 0
   let history: Record<string, number> = {}
 
-  // If PAT is available, use GraphQL for full year of history
+  // When a PAT is present, GraphQL gives us the more complete contribution calendar.
   if (pat) {
     history = await fetchGitHubGraphQLHistory(cleanUsername, pat)
     recentContributions = Object.values(history).reduce((sum, c) => sum + c, 0)
   }
 
-  // Also parse REST events (merges with GraphQL data if both present)
+  // REST events are a fallback and a lightweight way to keep contribution counts fresh.
   if (eventsResponse.ok) {
     const events = await eventsResponse.json() as GitHubEvent[]
     events.forEach(event => {
@@ -158,6 +164,7 @@ export async function fetchGitHubSnapshot(username: string, pat?: string) {
       }
     })
   }
+    // Return the exact shape the sync route expects, so persistence stays simple.
 
   return {
     username: user.login || cleanUsername,
@@ -171,8 +178,10 @@ export async function fetchGitHubSnapshot(username: string, pat?: string) {
   }
 }
 
+// LeetCode follows the same idea: one normalized snapshot with summary stats plus a date history.
 export async function fetchLeetCodeSnapshot(username: string, authToken?: string) {
   const cleanUsername = username.trim()
+  // These headers make the request look like a normal browser session, which LeetCode expects.
   const headers: Record<string, string> = {
     accept: 'application/json',
     'content-type': 'application/json',
@@ -221,11 +230,13 @@ export async function fetchLeetCodeSnapshot(username: string, authToken?: string
   const user = payload.data?.matchedUser
   if (!user) throw new Error('LeetCode user not found')
 
+  // We keep solved counts in a map so the final return object can read naturally.
   const solved = new Map((user.submitStatsGlobal?.acSubmissionNum ?? []).map((item) => [item.difficulty, item.count]))
 
   const history: Record<string, number> = {}
   if (user.userCalendar?.submissionCalendar) {
     try {
+      // LeetCode stores the calendar as JSON keyed by Unix timestamps, so we convert it to YYYY-MM-DD.
       const cal = JSON.parse(user.userCalendar.submissionCalendar)
       for (const [timestamp, count] of Object.entries(cal)) {
         const date = new Date(parseInt(timestamp) * 1000).toISOString().split('T')[0]
@@ -234,6 +245,7 @@ export async function fetchLeetCodeSnapshot(username: string, authToken?: string
     } catch (e) {}
   }
 
+  // The caller only needs this clean summary object, not the raw LeetCode payload.
   return {
     username: user.username || cleanUsername,
     realName: user.profile?.realName,

@@ -17,6 +17,7 @@ import {
   readStoredColorTheme,
 } from "@/lib/color-theme";
 
+// This control lets the user swap the app's accent palette without changing the light/dark mode.
 export function ToggleColorTheme() {
   const [palette, setPalette] = useState<ColorThemeId>("default");
   const [mounted, setMounted] = useState(false);
@@ -27,6 +28,7 @@ export function ToggleColorTheme() {
   }, []);
 
   const handleSelect = (id: ColorThemeId) => {
+    // Apply immediately so the selected palette is visible the moment the user clicks.
     applyColorTheme(id);
     setPalette(id);
   };

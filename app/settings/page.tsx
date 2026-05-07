@@ -31,6 +31,7 @@ import { toast } from "sonner";
 import { useTheme } from "next-themes";
 import type { SessionInfo } from "@/types";
 
+// Settings is the control center for the account, so it groups security, appearance, sessions, and deletion in one place.
 export default function SettingsPage() {
   const { data: session, isPending } = authClient.useSession();
   const { theme, setTheme } = useTheme();
@@ -66,6 +67,7 @@ export default function SettingsPage() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteSection, setShowDeleteSection] = useState(false);
 
+  // Save only the fields the user touched so empty inputs do not wipe stored secrets.
   const saveKeys = async () => {
     setKeysSaving(true)
     setKeysStatus('')
@@ -101,6 +103,7 @@ export default function SettingsPage() {
     }
   }
 
+    // Load the saved key status so the UI can show what is already configured without revealing values.
     const loadKeys = useCallback(async () => {
       try {
         const keysRes = await fetch('/api/profile/keys', { cache: 'no-store' })
@@ -115,6 +118,7 @@ export default function SettingsPage() {
       }
     }, [])
 
+    // Session listing lets the user see where they are signed in and revoke devices they no longer trust.
   const fetchSessions = useCallback(async () => {
     setIsLoadingSessions(true);
     try {
@@ -129,6 +133,7 @@ export default function SettingsPage() {
     }
   }, []);
 
+  // Some password flows start with social login, so we check whether a credential password exists.
   const checkHasPassword = useCallback(async () => {
     try {
       const res = await authClient.listAccounts();
@@ -141,6 +146,7 @@ export default function SettingsPage() {
   }, []);
 
   useEffect(() => {
+    // Nothing sensitive loads until we know the user is signed in.
     if (session) {
       fetchSessions();
       checkHasPassword();
@@ -148,6 +154,7 @@ export default function SettingsPage() {
     }
   }, [session, fetchSessions, checkHasPassword]);
 
+  // Revoking a single session removes only that device, which is safer than a blanket logout.
   const handleRevokeSession = async (sessionToken: string) => {
     setRevokingSessionId(sessionToken);
     try {
@@ -161,6 +168,7 @@ export default function SettingsPage() {
     }
   };
 
+  // Revoking all other sessions gives the user a fast way to secure the account after suspicious activity.
   const handleRevokeAllOtherSessions = async () => {
     setIsRevokingAll(true);
     try {
@@ -174,6 +182,7 @@ export default function SettingsPage() {
     }
   };
 
+  // User agents are noisy, so this helper extracts just the browser and OS labels the user can understand.
   const parseUserAgent = (ua?: string | null) => {
     if (!ua) return { browser: "Unknown browser", os: "Unknown device" };
 
@@ -194,6 +203,7 @@ export default function SettingsPage() {
     return { browser, os };
   };
 
+  // Formatting sessions as human dates makes account history easier to scan.
   const formatSessionDate = (date: Date | string) => {
     return new Date(date).toLocaleDateString("en-US", {
       month: "short",
@@ -204,6 +214,7 @@ export default function SettingsPage() {
     });
   };
 
+  // Password changes are guarded with a few simple checks before the request leaves the browser.
   const handleChangePassword = async () => {
     if (hasPassword && !currentPassword) {
       toast.error("Please enter your current password");
@@ -281,6 +292,7 @@ export default function SettingsPage() {
     }
   };
 
+  // Deleting an account is intentionally noisy so the user has to spell out the destructive action.
   const handleDeleteAccount = async () => {
     if (deleteConfirmation !== "DELETE") {
       toast.error('Please type "DELETE" to confirm');
@@ -298,6 +310,7 @@ export default function SettingsPage() {
     }
   };
 
+  // Theme mode choices are kept inline here because this page is where account preferences live.
   const themeOptions = [
     {
       value: "light",
@@ -354,7 +367,7 @@ export default function SettingsPage() {
       <NavBar />
 
       <div className="py-8 w-full max-w-2xl">
-        {/* Page Header */}
+        {/* The header explains that settings covers both preferences and security. */}
         <div className="mb-8 max-w-2xl mx-auto">
           <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
           <p className="mt-1 text-muted-foreground">
@@ -364,7 +377,7 @@ export default function SettingsPage() {
 
 
         <div className="max-w-2xl space-y-6">
-          {/* API Keys & Integration Card */}
+          {/* API keys and integration live together because they are all stored secrets. */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -374,7 +387,7 @@ export default function SettingsPage() {
                 <CardDescription>Manage your API keys for AI providers and platform integrations.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* AI Provider Keys Section */}
+                {/* AI provider keys are grouped first because they power ClawMind and study generation. */}
                 <div>
                   <h3 className="font-semibold text-sm mb-3">AI Provider Keys</h3>
                   <div className="grid sm:grid-cols-3 gap-4">
@@ -413,11 +426,11 @@ export default function SettingsPage() {
 
                 <Separator />
 
-                {/* Platform Integration Keys Section */}
+                {/* Platform keys are shown separately because GitHub and LeetCode drive activity syncing. */}
                 <div>
                   <h3 className="font-semibold text-sm mb-3">Platform Integration</h3>
                   <div className="space-y-4">
-                    {/* GitHub PAT */}
+                    {/* GitHub PAT unlocks fuller sync history, so the explanation is written right next to the field. */}
                     <div className="space-y-2">
                       <Label className="text-xs text-muted-foreground">GitHub PAT {hasKeys.hasGithubPat && <span className="text-emerald-600 font-medium">(Saved)</span>}</Label>
                       <p className="text-xs text-muted-foreground mb-1.5">Personal Access Token for full contribution history</p>
@@ -464,7 +477,7 @@ export default function SettingsPage() {
               </CardContent>
             </Card>
 
-          {/* Appearance */}
+          {/* Appearance controls make the app feel personal without affecting data or security. */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -531,7 +544,7 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          {/* Change Password */}
+          {/* Password management sits in its own card because it is a high-risk action with special rules. */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -546,7 +559,7 @@ export default function SettingsPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {/* Current Password — only if user already has one */}
+                {/* Current password is only shown for credential accounts because OAuth-only users do not have one yet. */}
                 {hasPassword && (
                   <div className="space-y-2">
                     <Label className="text-muted-foreground">Current Password</Label>
@@ -574,7 +587,7 @@ export default function SettingsPage() {
                   </div>
                 )}
 
-                {/* New Password */}
+                {/* New password is collected once and reused for both update and set-password flows. */}
                 <div className="space-y-2">
                   <Label className="text-muted-foreground">New Password</Label>
                   <div className="relative">
@@ -601,7 +614,7 @@ export default function SettingsPage() {
                   )}
                 </div>
 
-                {/* Confirm Password */}
+                {/* Confirmation helps catch typos before the account state changes. */}
                 <div className="space-y-2">
                   <Label className="text-muted-foreground">Confirm New Password</Label>
                   <div className="relative">
@@ -652,7 +665,7 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          {/* Active Sessions */}
+          {/* Active sessions help the user see where they are signed in and revoke what they do not trust. */}
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -762,7 +775,7 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          {/* Danger Zone */}
+          {/* The danger zone is visually separated so irreversible actions never blend in with normal settings. */}
           <Card className="border-destructive/30">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-destructive">

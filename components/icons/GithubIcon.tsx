@@ -1,5 +1,6 @@
 import * as React from "react";
 
+// A local GitHub icon keeps the UI consistent without adding another dependency.
 export function GithubIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" {...props}>

@@ -25,16 +25,19 @@ import { ToggleColorTheme } from "./toggle-color-theme";
 import { ToggleTheme } from "./toggle-theme";
 import { authClient } from "@/lib/auth-client";
 
+// The navbar is the main shell for navigation, auth state, and quick account actions.
 export function NavBar() {
   const { data: session, isPending } = authClient.useSession();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
 
+  // The onboarding tour is replayed by broadcasting a custom event that the tour component listens for.
   function handleReplayTour() {
     window.dispatchEvent(new CustomEvent("prism:replay-tour"));
   }
 
+  // Logout centralizes the sign-out flow so desktop and mobile menus behave the same way.
   const handleLogout = async () => {
     setIsLoggingOut(true);
     try {
@@ -57,6 +60,7 @@ export function NavBar() {
   // Platform sync should only run when the user presses the Sync button in Activities
   // or on the user's first visit (handled in the Activities component).
 
+  // Initials keep the avatar placeholder readable even when the user has no uploaded image.
   const getInitials = (name?: string | null) => {
     if (!name) return "U";
     return name
@@ -76,7 +80,7 @@ export function NavBar() {
 
   return (
     <nav className="w-full py-4 px-4 lg:px-0 lg:py-5 flex items-center justify-between lg:grid lg:grid-cols-3">
-      {/* Left - Logo */}
+      {/* The logo doubles as a home link so users can always recover their place. */}
       <div>
         <Link href={session ? "/dashboard" : "/"} className="flex items-center gap-2">
           <Activity className="size-6 lg:size-7 text-blue-500" />
@@ -84,7 +88,7 @@ export function NavBar() {
         </Link>
       </div>
 
-      {/* Center - Nav Links (desktop only, visible when logged in) */}
+      {/* Desktop nav is only shown when the user is signed in because these routes are authenticated. */}
       <div className="hidden lg:flex items-center justify-center gap-1">
         {session &&
           navLinks.map((link) => (
@@ -100,9 +104,9 @@ export function NavBar() {
           ))}
       </div>
 
-      {/* Right - Auth + Mobile Menu */}
+      {/* The right side adapts to loading, signed-in, and logged-out states. */}
       <div className="flex items-center justify-end gap-2 lg:gap-3">
-        {/* Theme toggles (desktop) */}
+        {/* Theme controls are always available on desktop because they affect the entire experience. */}
         <div className="hidden lg:flex items-center gap-2">
           <ToggleTheme />
           <ToggleColorTheme />
@@ -112,7 +116,7 @@ export function NavBar() {
           <LoaderIcon className="size-4 animate-spin text-muted-foreground" />
         ) : session ? (
           <>
-            {/* Profile Dropdown (desktop) */}
+            {/* The desktop profile menu groups account actions in one place. */}
             <div className="hidden lg:flex items-center">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -170,7 +174,7 @@ export function NavBar() {
               </DropdownMenu>
             </div>
 
-            {/* Mobile Hamburger (logged in) */}
+            {/* Mobile users get a sheet because it keeps the navigation compact and thumb-friendly. */}
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="lg:hidden">
@@ -263,7 +267,7 @@ export function NavBar() {
           </>
         ) : (
           <>
-            {/* Auth buttons (desktop) */}
+            {/* Logged-out visitors see signup and login as the primary calls to action. */}
             <div className="hidden lg:flex items-center gap-4">
               <Link
                 href="/login"
@@ -286,7 +290,7 @@ export function NavBar() {
               </Link>
             </div>
 
-            {/* Mobile menu (logged out) */}
+            {/* The logged-out mobile sheet keeps the same entry points without crowding the header. */}
             <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="lg:hidden">

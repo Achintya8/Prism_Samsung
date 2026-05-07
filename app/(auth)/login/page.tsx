@@ -19,6 +19,7 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import z from "zod";
 
+// Login keeps all sign-in paths in one place so returning users can choose the fastest route back in.
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
@@ -44,6 +45,7 @@ export default function LoginPage() {
 
   const anyLoading = isGoogleLoading || isGithubLoading || isLoading;
 
+  // Social sign-in is split into two helpers so each provider can show its own loading state.
   const signInWithGoogle = async () => {
     setIsGoogleLoading(true);
     await authClient.signIn.social({
@@ -52,6 +54,7 @@ export default function LoginPage() {
     });
   };
 
+  // Email login stays separate so password sign-in can be handled with form validation and error messages.
   const signInWithGithub = async () => {
     setIsGithubLoading(true);
     await authClient.signIn.social({
@@ -60,6 +63,7 @@ export default function LoginPage() {
     });
   };
 
+  // Form submission owns the credential flow because it needs to handle verification and error mapping.
   const onSubmit = async (data: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
     try {
@@ -93,13 +97,13 @@ export default function LoginPage() {
 
   return (
     <div className="w-full max-w-md px-6">
-      {/* Header */}
+      {/* The header sets expectations immediately: sign in, pick a provider, or use email. */}
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
         <p className="mt-2 text-sm text-muted-foreground">Sign in with Google, GitHub, or email</p>
       </div>
 
-      {/* Social Buttons */}
+      {/* Social buttons sit first because they are usually the fastest path back into the app. */}
       <SocialAuthButtons
         signInWithGoogle={signInWithGoogle}
         signInWithGithub={signInWithGithub}
@@ -108,17 +112,17 @@ export default function LoginPage() {
         lastUsedMethod={lastUsedMethod as "google" | "github" | undefined}
       />
 
-      {/* Divider */}
+      {/* The divider makes it obvious that email login is a fallback, not a separate flow. */}
       <div className="relative my-4 flex items-center">
         <Separator className="flex-1" />
         <span className="px-4 text-sm text-muted-foreground">Or continue with email</span>
         <Separator className="flex-1" />
       </div>
 
-      {/* Email / Password Form */}
+      {/* The email form stays compact because the page already offers a simpler social path above it. */}
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup className="gap-3">
-          {/* Email */}
+          {/* Email is marked with a last-used badge when the app knows this was the user's previous method. */}
           <Controller
             name="email"
             control={form.control}
@@ -147,7 +151,7 @@ export default function LoginPage() {
             )}
           />
 
-          {/* Password */}
+          {/* Password gets a visibility toggle because typing mistakes are common on login. */}
           <Controller
             name="password"
             control={form.control}
@@ -184,7 +188,7 @@ export default function LoginPage() {
             )}
           />
 
-          {/* Submit Button */}
+          {/* The primary button stays full width so the form feels like one clear action. */}
           <Button
             type="submit"
             disabled={anyLoading}
@@ -195,7 +199,7 @@ export default function LoginPage() {
         </FieldGroup>
       </form>
 
-      {/* Sign up link */}
+      {/* New users need a clear escape hatch to account creation. */}
       <p className="mt-3 text-center text-sm text-muted-foreground">
         Don&apos;t have an account?{" "}
         <Link
@@ -206,7 +210,7 @@ export default function LoginPage() {
         </Link>
       </p>
 
-      {/* Terms Footer */}
+      {/* Legal links sit at the bottom because they are required but not part of the main task. */}
       <p className="mt-2 text-center text-sm text-muted-foreground">
         By clicking continue, you agree to our{" "}
         <Link href="/terms" className="underline underline-offset-4 hover:text-foreground">

@@ -2,6 +2,7 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+// Cards provide the app's default content surface, so spacing and borders are centralized here.
 function Card({
   className,
   size = "default",
@@ -20,6 +21,7 @@ function Card({
   )
 }
 
+// Header, title, and description helpers keep card composition predictable in every screen.
 function CardHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div

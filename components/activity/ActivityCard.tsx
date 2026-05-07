@@ -2,9 +2,10 @@ import { Code2, Dumbbell, Footprints, BookOpen, Briefcase } from "lucide-react";
 import { GithubIcon } from "../icons/GithubIcon";
 import type { ActivityCardProps} from "@/types";
 
-
+// Each activity card packages the icon, title, points, and date into one compact history row.
 
 export function ActivityCard({ activity }: ActivityCardProps) {
+  // Different activity types get different icons so the list is readable at a glance.
   const getIcon = () => {
     switch (activity.type) {
       case "github":
@@ -24,6 +25,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
     }
   };
 
+  // The background tint is a small visual cue that helps distinguish categories without extra text.
   const getColor = () => {
     switch (activity.type) {
       case "github":
@@ -43,6 +45,7 @@ export function ActivityCard({ activity }: ActivityCardProps) {
     }
   };
 
+  // Human-friendly date labels make recent activity feel immediate.
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     const today = new Date("2026-04-30");

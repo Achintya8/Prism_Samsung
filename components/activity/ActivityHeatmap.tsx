@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import {HeatmapPoint, ActivityCacheEntry} from "@/types"
+
+
 // type HeatmapPoint = { date: string; count: number; activities?: string[] }
 // type ActivityCacheEntry = { status: 'idle' | 'loading' | 'loaded' | 'error'; activities: string[] }
 

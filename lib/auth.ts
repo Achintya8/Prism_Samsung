@@ -8,7 +8,9 @@ import { getResetPasswordEmail } from "@/components/emails/reset-password";
 import { getVerifyEmailEmail } from "@/components/emails/verify-email";
 import { getOTPEmail } from "@/components/emails/otp";
 
+// Central auth config keeps sign-in, verification, and password reset behavior in one place.
 export const auth = betterAuth({
+  // MongoDB is the source of truth for users and linked accounts.
   database: mongodbAdapter(db),
   emailAndPassword: {
     enabled: true,
@@ -25,6 +27,7 @@ export const auth = betterAuth({
   emailVerification: {
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
+    // The verification email is generated from a shared template so product copy stays consistent.
     sendVerificationEmail: async ({ user, url }) => {
       console.log(`[Email Verification] Sending to: ${user.email}, URL: ${url}`);
       const { data, error } = await resend.emails.send({
@@ -41,6 +44,7 @@ export const auth = betterAuth({
     },
   },
   accountLinking: {
+    // Google and GitHub are trusted because the app uses them for profile sync.
     enabled: true,
     trustedProviders: ["google", "github"],
   },
@@ -55,7 +59,9 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    // Track the last sign-in method so the UI can explain how the account was used.
     lastLoginMethod(),
+    // OTP email login is a separate path, so we keep its config close to the rest of auth.
     emailOTP({
       sendVerificationOTP: async ({ email, otp, type }) => {
         await resend.emails.send({

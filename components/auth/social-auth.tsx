@@ -5,6 +5,7 @@ import { GoogleIcon } from "../icons/GoogleIcon";
 import { GithubIcon } from "../icons/GithubIcon";
 import type { SocialAuthButtonsProps } from "@/types";
 
+// Social auth is kept in one component so login and signup can reuse the same provider buttons.
 export function SocialAuthButtons({
   signInWithGoogle,
   signInWithGithub,
@@ -14,7 +15,7 @@ export function SocialAuthButtons({
 }: SocialAuthButtonsProps) {
   return (
     <div className="flex flex-col gap-3 w-full">
-      {/* Google Button */}
+      {/* Google gets its own loading state so the button tells the truth about the current request. */}
       <div className="relative w-full">
         <Button
           variant="outline"
@@ -38,7 +39,7 @@ export function SocialAuthButtons({
         )}
       </div>
 
-      {/* GitHub Button */}
+      {/* GitHub mirrors the same layout so the two sign-in paths feel equally intentional. */}
       <div className="relative w-full">
         <Button
           variant="outline"

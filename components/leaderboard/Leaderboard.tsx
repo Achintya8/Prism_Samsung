@@ -19,16 +19,19 @@ function field(record: Record<string, unknown>, key: string) {
   return record[key]
 }
 
+// The leaderboard accepts multiple backend shapes, so these helpers normalize the data before rendering.
 function textField(record: Record<string, unknown>, key: string) {
   const value = field(record, key)
   return typeof value === 'string' ? value : undefined
 }
 
+// Numbers may arrive from different fields depending on the source, so we pick the first useful value.
 function numberField(record: Record<string, unknown>, key: string) {
   const value = field(record, key)
   return typeof value === 'number' ? value : undefined
 }
 
+// Initials keep the podium readable even when no avatar image exists.
 function initials(name: string) {
   return name
     .split(' ')
@@ -38,6 +41,7 @@ function initials(name: string) {
     .join('') || 'U'
 }
 
+// Convert arbitrary leaderboard payloads into one stable view model for the UI.
 function normalizeEntry(entry: unknown, index: number): LeaderboardEntry {
   const record = typeof entry === 'object' && entry !== null ? entry as Record<string, unknown> : {}
   const isCurrentUser = field(record, 'isCurrentUser') === true
@@ -55,6 +59,7 @@ function normalizeEntry(entry: unknown, index: number): LeaderboardEntry {
   }
 }
 
+// The podium highlights the top ranks so the first few entries feel distinct from the rest of the list.
 function PodiumEntry({ entry, place }: { entry: LeaderboardEntry; place: 'first' | 'side' }) {
   const isFirst = place === 'first'
 
@@ -86,7 +91,7 @@ export function Leaderboard() {
   const [initialLoading, setInitialLoading] = useState(true)
 
   useEffect(() => {
-    // Fetch user's rank immediately (fast, single query)
+    // Fetch the signed-in user's own rank first so the personal result appears as soon as possible.
     const loadUserRank = async () => {
       try {
         const res = await fetch('/api/leaderboard/my-rank')
@@ -99,7 +104,7 @@ export function Leaderboard() {
       } catch {}
     }
 
-    // Fetch full leaderboard in parallel (slower)
+    // The full leaderboard is fetched in parallel because it is useful, but not required for first paint.
     const loadFullLeaderboard = async () => {
       setLoading(true)
       try {
@@ -117,7 +122,7 @@ export function Leaderboard() {
       }
     }
 
-    // Start both in parallel
+    // Running both requests together keeps the overall wait time lower.
     setInitialLoading(true)
     Promise.all([loadUserRank(), loadFullLeaderboard()]).finally(() => setInitialLoading(false))
   }, [])
@@ -190,7 +195,7 @@ export function Leaderboard() {
   return (
     <div id="tour-leaderboard" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-6">
       <div className="bg-card text-card-foreground rounded-xl shadow-sm border border-border overflow-hidden">
-        {/* Header */}
+        {/* The header frames the leaderboard as a competition view and gives the user a quick refresh action. */}
         <div className="bg-linear-to-r from-blue-600 to-purple-600 p-6 text-white">
           <div className="flex items-center gap-3 mb-2 justify-between">
             <div className="flex items-center gap-3">
@@ -209,7 +214,7 @@ export function Leaderboard() {
           <p className="text-blue-100">Top performers this month</p>
         </div>
 
-        {/* Your Rank Section */}
+        {/* The personal rank card lets the user compare themselves without hunting through the whole table. */}
         {userEntry && (
           <div className="bg-blue-50 dark:bg-blue-950/40 border-b border-blue-200 dark:border-blue-900 p-4 sm:p-6">
             <p className="text-xs text-blue-600 font-semibold uppercase tracking-wider mb-3">Your Rank</p>
@@ -231,7 +236,7 @@ export function Leaderboard() {
           </div>
         )}
 
-        {/* Top 3 Podium */}
+        {/* The podium gives the top three extra visual weight because that is the part people notice first. */}
         <div className="p-6 bg-gradient-to-b from-muted/50 to-card">
           {entries.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto">
@@ -249,7 +254,7 @@ export function Leaderboard() {
             </div>
           )}
 
-          {/* Remaining list */}
+          {/* The remaining list keeps the rest of the rankings compact and scannable. */}
           <div className="mt-6 max-w-2xl mx-auto space-y-2">
             {entries.slice(3).map((entry) => (
               <div key={entry.userId ?? entry.rank} className="flex items-center justify-between border border-border p-3 rounded-lg bg-card">

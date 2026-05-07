@@ -9,6 +9,7 @@ import { DailyActivityLog } from '@/lib/models/DailyActivityLog'
 import { pointsFor } from '@/lib/points'
 import { updateStreakFromLogs } from '@/lib/streak'
 
+// Normalized activity shape returned to the UI so cards and feeds can render one list consistently.
 type ActivityEvent = {
   _id: { toString(): string }
   type: 'github' | 'leetcode' | 'gym' | 'jogging' | 'study' | 'project'
@@ -19,8 +20,10 @@ type ActivityEvent = {
   details?: string
 }
 
+// GET returns the user's activity feed, optionally narrowed to a single day.
 export async function GET(request: Request) {
   try {
+    // The feed is private, so the request must belong to a logged-in user.
     const session = await auth.api.getSession({ headers: await headers() })
     if (!session?.user?.id) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
@@ -30,11 +33,13 @@ export async function GET(request: Request) {
     await connectToDB()
 
     const { searchParams } = new URL(request.url)
+    // A small default keeps the feed fast, while the date filter can request a bigger window for a single day.
     const limit = Math.min(Number(searchParams.get('limit') || 25), 100)
     const dateQuery = searchParams.get('date')
 
     let query: any = { userId }
     if (dateQuery) {
+      // Build a UTC day range so a local browser timezone does not shift the result.
       const startDate = new Date(dateQuery)
       startDate.setUTCHours(0, 0, 0, 0)
       const endDate = new Date(dateQuery)
@@ -50,6 +55,7 @@ export async function GET(request: Request) {
 
     const events = await Activity.find(query).sort({ date: -1 }).limit(dateQuery ? 1000 : limit).lean<ActivityEvent[]>()
     
+    // Shape the database records into the flatter object the client already expects.
     const activities = events.map((event) => ({
       id: event._id.toString(),
       type: event.type,
@@ -66,6 +72,7 @@ export async function GET(request: Request) {
   }
 }
 
+// The feed form validates inputs before a custom activity is written to the database.
 const ActivitySchema = z.object({
   type: z.enum(['github', 'leetcode', 'gym', 'jogging', 'study', 'project']),
   title: z.string().min(1, 'Title is required'),
@@ -74,8 +81,10 @@ const ActivitySchema = z.object({
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date must be YYYY-MM-DD').optional(),
 })
 
+// POST lets the user add a manual activity, then updates points and streaks to match.
 export async function POST(request: Request) {
   try {
+    // Manual activities are also private, so we guard them with the session check.
     const session = await auth.api.getSession({ headers: await headers() })
     if (!session?.user?.id) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
@@ -88,6 +97,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: parsed.error.format() }, { status: 400 })
     }
 
+    // Normalize the incoming payload before it becomes a durable record.
     const { type, title, value, details } = parsed.data
     const todayStr = new Date().toISOString().slice(0, 10)
     const dateStr = parsed.data.date || todayStr
@@ -95,6 +105,7 @@ export async function POST(request: Request) {
 
     await connectToDB()
   
+  // Convert the submitted activity type into the scoring model the rest of the app uses.
     let pts = 0;
     if (type === 'gym') pts = pointsFor('gym_session', value)
     else if (type === 'jogging') pts = pointsFor('jog_per_km', value)
@@ -131,6 +142,7 @@ export async function POST(request: Request) {
       totalPoints: user.totalPoints,
       currentStreak: user.currentStreak,});
 
+    // Every manual activity marks that day as active so the streak engine can do its job.
     await DailyActivityLog.findOneAndUpdate(
       { userId, date: dateStr },
       { $set: { hasActivity: true }, $inc: { totalCount: 1 } },
@@ -142,6 +154,7 @@ export async function POST(request: Request) {
       userId,
       logs: dailyLogs.map((log) => ({
         userId: log.userId,
+    // Build the atomic increments separately so each activity type updates only the counters it owns.
         date: log.date,
         hasActivity: log.hasActivity,
         totalCount: log.totalCount,
@@ -174,6 +187,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ ok: true, activity: activityEvent, pointsAwarded: pts })
   } catch (error) {
+    // Keep the response generic and only log the detailed failure for server-side debugging.
     console.error('Activities POST Error:', error)
     if (error instanceof Error) {
       console.error('Activities POST Error Stack:', error.stack)

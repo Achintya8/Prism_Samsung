@@ -4,6 +4,8 @@ import { Calendar as CalendarIcon, Loader2, Dumbbell, Route, Code, SearchCode, B
 import { useEffect, useState } from 'react'
 import { Calendar, CalendarDayButton } from "@/components/ui/calendar"
 import {ActivityEvent} from "@/types"
+// The streak panel combines the calendar and day detail view so consistency feels visible, not abstract.
+
 // type ActivityEvent = {
 //   id: string
 //   type: 'github' | 'leetcode' | 'gym' | 'jogging' | 'study' | 'project'
@@ -14,6 +16,7 @@ import {ActivityEvent} from "@/types"
 // }
 
 function getActivityIcon(type: string) {
+  // Each activity gets an icon so the detail list stays readable even when there are many entries.
   switch (type) {
     case 'gym': return <Dumbbell className="w-4 h-4" />
     case 'jogging': return <Route className="w-4 h-4" />
@@ -35,6 +38,7 @@ export function StreakDisplay() {
   const [activities, setActivities] = useState<ActivityEvent[]>([])
   const [loadingActivities, setLoadingActivities] = useState(false)
 
+  // Load the streak summary and the active-date set together because both power the same calendar experience.
   useEffect(() => {
     async function loadStats() {
       try {
@@ -69,6 +73,7 @@ export function StreakDisplay() {
     return () => window.removeEventListener('activity:logged', loadStats)
   }, [])
 
+  // When the selected date changes, refresh the right-hand activity list for that exact day.
   useEffect(() => {
     async function loadActivities() {
       setLoadingActivities(true)
@@ -101,6 +106,7 @@ export function StreakDisplay() {
     <div className="rounded-xl border border-border bg-card p-6 text-card-foreground shadow-sm ring-1 ring-foreground/10 mb-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
+          {/* The fire icon makes the streak state obvious at a glance. */}
           <img src="/fire.png?v=2" alt="Streak" className={`w-6 h-6 object-contain ${currentStreak > 0 ? '' : 'opacity-40 grayscale'}`} />
           <h2 className="text-lg font-semibold text-foreground">Activity Calendar</h2>
         </div>
@@ -111,7 +117,7 @@ export function StreakDisplay() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* First Half: Calendar */}
+        {/* The calendar stays on the left because selecting a date is the first job the user performs here. */}
         <div className="flex justify-center lg:border-r border-border lg:pr-8">
           <Calendar
             mode="single"
@@ -121,13 +127,13 @@ export function StreakDisplay() {
             components={{
               DayButton: (props) => {
                 const { day } = props;
-                // Get YYYY-MM-DD from day.date accounting for local timezone
+                // Convert the cell date into a local YYYY-MM-DD key so it matches the API data exactly.
                 const offset = day.date.getTimezoneOffset()
                 const dateStr = new Date(day.date.getTime() - (offset*60*1000)).toISOString().split('T')[0]
                 
                 const hasActivity = activeDates.has(dateStr);
                 
-                // Today at midnight for comparing past/future
+                // Restrict the dot marker to past or current days so future cells do not look actionable.
                 const today = new Date()
                 today.setHours(0, 0, 0, 0)
                 const isPastOrToday = day.date <= today;
@@ -149,7 +155,7 @@ export function StreakDisplay() {
                     )}
                     <CalendarDayButton 
                       {...props} 
-                      className={`${props.className} relative z-10 w-full h-full bg-transparent hover:bg-transparent data-[selected-single=true]:bg-transparent data-[selected-single=true]:text-foreground data-[selected-single=true]:ring-2 data-[selected-single=true]:ring-orange-500 ${hasActivity ? '!text-white font-bold drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] text-xs sm:text-sm mt-1' : ''}`} 
+                      className={`${props.className} relative z-10 w-full h-full bg-transparent hover:bg-transparent data-[selected-single=true]:bg-transparent data-[selected-single=true]:text-foreground data-[selected-single=true]:ring-2 data-[selected-single=true]:ring-orange-500 ${hasActivity ? 'text-white! font-bold drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] text-xs sm:text-sm mt-1' : ''}`} 
                     />
                   </div>
                 )
@@ -158,8 +164,8 @@ export function StreakDisplay() {
           />
         </div>
 
-        {/* Second Half: Activities for Date */}
-        <div className="flex flex-col h-full min-h-[350px]">
+        {/* The right pane explains what happened on the selected day in plain text. */}
+        <div className="flex flex-col h-full min-h-87.5">
           <h3 className="font-semibold text-foreground mb-4 pb-2 border-b border-border flex items-center justify-between">
             <span>
               {selectedDate.toLocaleDateString("en-US", { weekday: 'long', month: 'short', day: 'numeric' })}

@@ -7,6 +7,7 @@ import { User } from '@/lib/models/User'
 
 export const dynamic = 'force-dynamic'
 
+// This schema keeps profile edits narrow and predictable so we only accept the fields the UI is allowed to change.
 const ProfileBody = z.object({
   name: z.string().min(1).max(80).optional(),
   githubUsername: z.string().max(40).optional().or(z.literal('')),
@@ -36,6 +37,7 @@ type ProfileUser = {
   lastPlatformSyncAt?: Date
 }
 
+// The API returns a flattened profile shape so the client can render it without extra transforms.
 function serializeUser(user: ProfileUser) {
   return {
     id: user._id.toString(),
@@ -61,6 +63,7 @@ function serializeUser(user: ProfileUser) {
   }
 }
 
+// GET returns the current user's profile summary for the settings and dashboard screens.
 export async function GET(request: Request) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session?.user?.id) {
@@ -76,12 +79,14 @@ export async function GET(request: Request) {
   return NextResponse.json({ ok: true, profile: serializeUser(user) })
 }
 
+// PATCH saves the profile fields the user is allowed to edit from the settings form.
 export async function PATCH(request: Request) {
   const session = await auth.api.getSession({ headers: await headers() })
   if (!session?.user?.id) {
     return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
   }
 
+  // Validate before touching the database so bad input fails fast and cleanly.
   const body = await request.json()
   const parsed = ProfileBody.safeParse(body)
   if (!parsed.success) {
@@ -89,6 +94,7 @@ export async function PATCH(request: Request) {
   }
 
   await connectToDB()
+  // Only include fields that were actually provided so we do not overwrite values by accident.
   const update: Record<string, string> = {}
   if (parsed.data.name !== undefined) update.name = parsed.data.name.trim()
   if (parsed.data.githubUsername !== undefined) update.githubUsername = parsed.data.githubUsername.trim()

@@ -9,6 +9,7 @@ export function getVerifyEmailEmail({
 }) {
   const truncatedUrl = url.length > 72 ? url.slice(0, 69) + "..." : url;
 
+  // Verification email mirrors the reset layout so the account emails feel like one family.
   return `
 <!DOCTYPE html>
 <html lang="en">

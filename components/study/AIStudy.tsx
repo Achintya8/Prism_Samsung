@@ -8,6 +8,7 @@ import { Tldraw } from 'tldraw';
 import 'tldraw/tldraw.css';
 // import { NavBar } from "../navbar/navbar";
 import {QuizQuestion, Note, Subject, Whiteboard} from "@/types"
+// ClawMind's study workspace keeps subjects, notes, quizzes, and whiteboards in one guided flow.
 // type QuizQuestion = {
 //   question: string
 //   options: string[]
@@ -63,6 +64,7 @@ export function AIStudy() {
   const [brushColor, setBrushColor] = useState('#000000');
   const QUIZ_COUNT = 8;
 
+  // The whiteboard canvas needs to resize with the view so drawings land in the right place.
   useEffect(() => {
     if (view === 'whiteboard' && canvasRef.current) {
       const canvas = canvasRef.current;
@@ -80,6 +82,7 @@ export function AIStudy() {
     }
   }, [view]);
 
+  // If a saved whiteboard is waiting, draw it back into the canvas once the whiteboard view is ready.
   useEffect(() => {
     if (view !== 'whiteboard' || !pendingWhiteboard) return;
     const canvas = canvasRef.current;
@@ -100,6 +103,7 @@ export function AIStudy() {
     img.src = pendingWhiteboard;
   }, [pendingWhiteboard, view]);
 
+  // Drawing starts when the user presses down on the canvas and ends when they lift off.
   const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
     setIsDrawing(true);
     const pos = getPos(e);
@@ -110,6 +114,7 @@ export function AIStudy() {
     }
   };
 
+  // Extend the current stroke only while the pointer remains active.
   const draw = (e: React.MouseEvent | React.TouchEvent) => {
     if (!isDrawing || !canvasRef.current) return;
     const pos = getPos(e);
@@ -121,10 +126,12 @@ export function AIStudy() {
     }
   };
 
+  // StopDrawing closes the active stroke so the next line starts cleanly.
   const stopDrawing = () => {
     setIsDrawing(false);
   };
 
+  // Pointer coordinates are normalized against the canvas bounding box so mouse and touch behave the same.
   const getPos = (e: React.MouseEvent | React.TouchEvent) => {
     if (!canvasRef.current) return null;
     const canvas = canvasRef.current;
@@ -143,6 +150,7 @@ export function AIStudy() {
     };
   };
 
+  // Clearing the canvas gives the user a quick way to restart a diagram from scratch.
   const clearCanvas = () => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
@@ -151,6 +159,7 @@ export function AIStudy() {
     }
   };
 
+  // Export the canvas as an image, scaling it down if needed so saved whiteboards stay lightweight.
   const getWhiteboardImage = (canvas: HTMLCanvasElement) => {
     const maxWidth = 900;
     const maxHeight = 500;
@@ -175,6 +184,7 @@ export function AIStudy() {
     return image;
   };
 
+  // Subjects are the top-level study folders that everything else hangs off.
   async function loadSubjects() {
     const response = await fetch('/api/ai/directories');
     if (!response.ok) return;
@@ -184,6 +194,7 @@ export function AIStudy() {
     }
   }
 
+  // Loading notes also refreshes the subject in state so the note count stays truthful.
   async function loadNotes(subject: Subject) {
     const response = await fetch(`/api/ai/notes?subjectId=${subject.id}`);
     if (!response.ok) return;
@@ -200,17 +211,20 @@ export function AIStudy() {
     void loadSubjects();
   }, []);
 
+  // Clicking a subject drills into its notes instead of jumping straight into the note editor.
   const handleSubjectClick = async (subject: Subject) => {
     setSelectedSubject(subject);
     setView('notes');
     await loadNotes(subject);
   };
 
+  // Opening a note switches to the markdown preview so the generated content is easy to read.
   const handleNoteClick = (note: Note) => {
     setSelectedNote(note);
     setView("noteDetail");
   };
 
+  // The back button behaves like a breadcrumb, unwinding the current view one level at a time.
   const handleBack = () => {
     if (view === 'quiz' && quizLoading) return;
     if (view === 'quiz') {
@@ -227,6 +241,7 @@ export function AIStudy() {
     }
   };
 
+  // Create subject only when the name is non-empty so the directory list stays tidy.
   async function createSubject() {
     if (!subjectName.trim()) return;
     setLoading(true);
@@ -249,6 +264,7 @@ export function AIStudy() {
     }
   }
 
+  // Notes are generated from either pasted text or a prompt, depending on what the user typed.
   async function createNote() {
     if (!selectedSubject || !noteTitle.trim()) return;
     setLoading(true);
@@ -272,6 +288,7 @@ export function AIStudy() {
     }
   }
 
+  // Quizzes can be created from a single note or from the subject as a whole.
   async function generateQuiz() {
     if (!selectedNote) return;
     if (selectedNote.hasQuiz && selectedNote.quiz && selectedNote.quiz.length > 0) {
@@ -304,6 +321,7 @@ export function AIStudy() {
     }
   }
 
+  // Practice quizzes reuse the current subject content to create fresh recall questions.
   async function generatePracticeQuiz() {
     if (!selectedSubject) return;
     const currentNotes = selectedSubject.notes ?? [];
@@ -334,6 +352,7 @@ export function AIStudy() {
     }
   }
 
+  // Removing a note also clears it from the current selection so the view does not point at deleted data.
   async function deleteNote(note: Note) {
     if (!selectedSubject) return;
     setLoading(true);
@@ -356,6 +375,7 @@ export function AIStudy() {
     }
   }
 
+  // Whiteboards are saved as images because the drawing experience is intentionally freeform.
   async function saveWhiteboard() {
     if (!selectedSubject) {
       setStatus('Select a subject before saving a whiteboard.');
@@ -389,6 +409,7 @@ export function AIStudy() {
     }
   }
 
+  // Whiteboards are loaded separately because they are attached to the current subject, not the current note.
   async function loadWhiteboards(subjectId: string) {
     const response = await fetch(`/api/ai/whiteboards?subjectId=${subjectId}`, { cache: 'no-store' });
     const json = await response.json();
@@ -399,6 +420,7 @@ export function AIStudy() {
     }
   }
 
+  // Deleting a whiteboard uses the subject id and board id so the server can remove the exact record.
   async function deleteWhiteboard(whiteboardId: string, createdDate?: string) {
     console.log('Attempting to delete whiteboard with ID:', whiteboardId);
     if (!selectedSubject) {
@@ -428,6 +450,7 @@ export function AIStudy() {
     }
   }
 
+  // Opening a saved board switches the view into the drawing canvas with the image already loaded.
   function openWhiteboard(board: Whiteboard) {
     if (!board?.image) return;
     setPendingWhiteboard(board.image);
@@ -438,6 +461,7 @@ export function AIStudy() {
   const quizQuestions = activeQuiz;
 
   useEffect(() => {
+    // Refresh boards whenever the user lands back on notes or whiteboard for the active subject.
     if (selectedSubject?.id && (view === 'notes' || view === 'whiteboard')) {
       if (skipLoadRef.current) {
         skipLoadRef.current = false;
@@ -451,6 +475,7 @@ export function AIStudy() {
     <div className={view === 'whiteboard' ? 'w-full h-screen flex flex-col p-2 sm:p-4' : 'max-w-6xl mx-auto px-4 sm:px-6 py-6 pb-20 md:pb-6'}>
       {view === 'whiteboard' && (
         <>
+          {/* In whiteboard mode the back button is the main way to leave the canvas without losing context. */}
           <button
             onClick={handleBack}
             disabled={view === 'quiz' && quizLoading}
@@ -466,6 +491,7 @@ export function AIStudy() {
         </>
       )}
       
+      {/* The non-whiteboard views share the same header and navigation structure. */}
       {view !== 'whiteboard' && (
         <div>
           <div className="mb-6">
@@ -480,6 +506,7 @@ export function AIStudy() {
                 </button>
               )}
               <h1 className="text-2xl font-semibold text-foreground">ClawMind</h1>
+              {/* The model picker lets the user choose which AI provider generates the study content. */}
               <div className="ml-auto flex items-center gap-2">
                 <span className="text-sm text-muted-foreground hidden sm:inline">AI Model:</span>
                 <select 
@@ -507,6 +534,7 @@ export function AIStudy() {
         )}
       </div>
 
+      {/* Subjects are the top-level entry point into the study workspace. */}
       {view === 'subjects' && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
@@ -517,6 +545,7 @@ export function AIStudy() {
             </button>
           </div>
 
+          {/* New subject creation stays inline so the user does not leave the current flow. */}
           {showNewSubject && (
             <div className="bg-card rounded-xl border border-border p-4">
               <input value={subjectName} onChange={(event) => setSubjectName(event.target.value)} type="text" placeholder="Subject name" className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3" />
@@ -551,6 +580,7 @@ export function AIStudy() {
         </div>
       )}
 
+      {/* Notes show the generated study material for the selected subject. */}
       {view === 'notes' && selectedSubject && (
         <div className="space-y-4">
           <div className="flex justify-between items-center">
@@ -561,6 +591,7 @@ export function AIStudy() {
             </button>
           </div>
 
+          {/* Note creation lives inline because the source text is usually already in the user's head or clipboard. */}
           {showNewNote && (
             <div className="bg-card rounded-xl border border-border p-4">
               <input value={noteTitle} onChange={(event) => setNoteTitle(event.target.value)} type="text" placeholder="Note title" className="w-full px-4 py-2 border border-border rounded-lg bg-background text-foreground focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-3" />
@@ -629,6 +660,7 @@ export function AIStudy() {
         </div>
       )}
 
+      {/* The note detail view turns the generated markdown into a readable article-like page. */}
       {view === 'noteDetail' && selectedNote && (
         <div className="space-y-4">
           <div className="bg-card rounded-2xl p-8 border border-border shadow-sm">
@@ -661,6 +693,7 @@ export function AIStudy() {
         </div>
       )}
 
+      {/* Quiz mode is focused on recall, so the UI strips away everything except questions and answers. */}
       {view === 'quiz' && (
         <div className="space-y-4">
           <div className="bg-card rounded-xl p-6 border border-border">
