@@ -301,10 +301,22 @@ export default function SettingsPage() {
 
     setIsDeleting(true);
     try {
-      await authClient.deleteUser();
+      const res = await fetch("/api/auth/delete-account", {
+        method: "POST",
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        throw new Error(data?.message || "Failed to delete account");
+      }
+
       toast.success("Account deleted. We're sorry to see you go.");
-    } catch {
-      toast.error("Failed to delete account. Please try again.");
+      window.location.href = "/login";
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to delete account. Please try again.",
+      );
     } finally {
       setIsDeleting(false);
     }
