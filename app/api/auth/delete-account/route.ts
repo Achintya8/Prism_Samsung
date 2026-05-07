@@ -19,29 +19,36 @@ export async function POST() {
   }
 
   const userId = session.user.id;
-  const userObjectId = ObjectId.isValid(userId) ? new ObjectId(userId) : null;
+  const email = session.user.email;
+
+  // better-auth's MongoDB adapter stores user._id as an ObjectId; bail early
+  // rather than passing an arbitrary string into a query and tripping a BSON error.
+  if (!ObjectId.isValid(userId)) {
+    return NextResponse.json({ message: "Invalid user id" }, { status: 400 });
+  }
+  const userObjectId = new ObjectId(userId);
 
   try {
-    // Better-auth records live in MongoDB collections keyed by string userId.
+    // Auth-side collections store userId as the string form of the ObjectId.
     await Promise.all([
       db.collection("session").deleteMany({ userId }),
       db.collection("account").deleteMany({ userId }),
-      db.collection("verification").deleteMany({ identifier: session.user.email }),
+      email
+        ? db.collection("verification").deleteMany({ identifier: email })
+        : Promise.resolve(),
     ]);
 
     // App-owned data uses mongoose; some schemas store userId as ObjectId, others as string.
     await connectToDB();
     await Promise.all([
-      userObjectId ? Activity.deleteMany({ userId: userObjectId }) : Promise.resolve(),
-      userObjectId ? Subject.deleteMany({ userId: userObjectId }) : Promise.resolve(),
+      Activity.deleteMany({ userId: userObjectId }),
+      Subject.deleteMany({ userId: userObjectId }),
       DailyActivityLog.deleteMany({ userId }),
       Connection.deleteMany({ userId }),
     ]);
 
     // Delete the user record last so cleanup queries above can still resolve owners.
-    await db.collection("user").deleteOne(
-      userObjectId ? { _id: userObjectId } : { _id: userId as unknown as ObjectId },
-    );
+    await db.collection("user").deleteOne({ _id: userObjectId });
 
     const response = NextResponse.json({ ok: true });
     // Clear better-auth session cookies so the client is signed out immediately.
