@@ -508,7 +508,7 @@ export function AIStudy() {
           </button>
           <div className="flex-1 flex items-start justify-center pt-4">
             <div className="w-full max-w-2xl sm:max-w-4xl lg:max-w-6xl h-5/6 rounded-lg border border-border overflow-hidden shadow-lg">
-              <Tldraw licenseKey={process.env.TL_DRAW} />
+              <Tldraw licenseKey={process.env.NEXT_PUBLIC_TLDRAW_LICENSE_KEY} />
             </div>
           </div>
         </>
