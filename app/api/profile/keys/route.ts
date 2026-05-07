@@ -7,8 +7,10 @@ import { encrypt } from '@/lib/encryption'
 
 export const dynamic = 'force-dynamic'
 
+// GET only returns booleans so the UI can show which secrets are already saved without exposing them.
 export async function GET(request: Request) {
   try {
+    // Keys are personal data, so this endpoint is locked to the signed-in user.
     const session = await auth.api.getSession({ headers: await headers() })
     if (!session?.user?.id) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
@@ -34,8 +36,10 @@ export async function GET(request: Request) {
   }
 }
 
+// POST stores encrypted API keys and tokens, or clears them when the user removes a value in the form.
 export async function POST(request: Request) {
   try {
+    // Re-check the session here because this endpoint writes sensitive data.
     const session = await auth.api.getSession({ headers: await headers() })
     if (!session?.user?.id) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
@@ -49,6 +53,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: false, error: 'User not found' }, { status: 404 })
     }
 
+    // Each key is handled separately so users can update one provider without touching the others.
     if (body.openaiKey !== undefined) {
       user.openaiKey = body.openaiKey ? encrypt(body.openaiKey.trim()) : undefined
     }
@@ -71,6 +76,7 @@ export async function POST(request: Request) {
 
     await user.save()
 
+    // Return only presence flags so the client can refresh the secure key status chips.
     return NextResponse.json({
       ok: true,
       hasOpenAI: !!user.openaiKey,

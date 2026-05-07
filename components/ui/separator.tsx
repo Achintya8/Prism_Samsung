@@ -5,6 +5,7 @@ import { Separator as SeparatorPrimitive } from "radix-ui"
 
 import { cn } from "@/lib/utils"
 
+// Separators are intentionally minimal because their job is to give structure without drawing attention.
 function Separator({
   className,
   orientation = "horizontal",

@@ -12,6 +12,7 @@ import { Camera, Check, LoaderIcon, Mail, Shield, User, Calendar, X, Pencil, Eye
 import { useState, useRef, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 
+// The profile page lets the user manage identity, linked accounts, and account-level settings in one place.
 export default function ProfilePage() {
   const { data: session, isPending } = authClient.useSession();
   const [isEditing, setIsEditing] = useState(false);
@@ -24,6 +25,7 @@ export default function ProfilePage() {
   const [linkedAccounts, setLinkedAccounts] = useState<string[]>([]);
   const [isLinking, setIsLinking] = useState<string | null>(null);
 
+  // We read linked providers once so the UI can show which accounts are already connected.
   const fetchLinkedAccounts = useCallback(async () => {
     try {
       const res = await authClient.listAccounts();
@@ -35,6 +37,7 @@ export default function ProfilePage() {
     }
   }, []);
 
+  // Username fields are loaded from the profile API so edit mode starts from the current server values.
   const loadProfileData = useCallback(async () => {
     try {
       const res = await fetch('/api/profile', { cache: 'no-store' })
@@ -52,6 +55,7 @@ export default function ProfilePage() {
 
 
   useEffect(() => {
+    // Only fetch profile extras after we know the session exists.
     if (session) {
       fetchLinkedAccounts();
       loadProfileData();
@@ -68,6 +72,7 @@ export default function ProfilePage() {
     }
   };
 
+  // Initials keep the avatar fallback readable when no custom image exists.
   const getInitials = (name?: string | null) => {
     if (!name) return "U";
     return name
@@ -79,6 +84,7 @@ export default function ProfilePage() {
   };
 
   const handleStartEditing = () => {
+    // Copy the latest values into local state so cancel can safely revert changes.
     setName(session?.user?.name || "");
     setGithubUsername(githubUsername);
     setLeetcodeUsername(leetcodeUsername);
@@ -86,6 +92,7 @@ export default function ProfilePage() {
   };
 
   const handleCancelEditing = () => {
+    // Clearing local state keeps the next edit session fresh.
     setIsEditing(false);
     setName("");
     setGithubUsername("");
@@ -93,6 +100,7 @@ export default function ProfilePage() {
   };
 
   const handleSave = async () => {
+    // The name is required because the profile view uses it as the user's primary identity.
     if (!name.trim()) {
       toast.error("Name cannot be empty");
       return;
@@ -121,6 +129,7 @@ export default function ProfilePage() {
     }
   };
 
+  // Avatar uploads are client-side file reads because the account image is stored as a data URL.
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -153,6 +162,7 @@ export default function ProfilePage() {
     }
   };
 
+  // A friendly date format makes account metadata easier to read at a glance.
   const formatDate = (date?: string | Date | null) => {
     if (!date) return "N/A";
     return new Date(date).toLocaleDateString("en-US", {
@@ -195,7 +205,7 @@ export default function ProfilePage() {
   return (
     <div>
       <div className="py-8">
-        {/* Page Header */}
+        {/* The page header names the screen and explains why the user is here. */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold tracking-tight">Profile</h1>
           <p className="mt-1 text-muted-foreground">
@@ -204,11 +214,11 @@ export default function ProfilePage() {
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
-          {/* Left Column — Avatar Card */}
+          {/* The left column is focused on identity because the avatar and quick stats are the first thing people look for. */}
           <div className="lg:col-span-1">
             <Card>
               <CardContent className="flex flex-col items-center pt-2">
-                {/* Avatar with Upload Overlay */}
+                {/* The avatar has an overlay so the upload affordance lives exactly where the image is. */}
                 <div className="group relative">
                   <Avatar className="size-28 ring-4 ring-background shadow-lg">
                     <AvatarImage
@@ -221,7 +231,7 @@ export default function ProfilePage() {
                     </AvatarFallback>
                   </Avatar>
 
-                  {/* Upload Overlay */}
+                  {/* Clicking the overlay opens the file picker, which keeps the interaction simple. */}
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isUploadingAvatar}
@@ -242,13 +252,13 @@ export default function ProfilePage() {
                   />
                 </div>
 
-                {/* Name & Email */}
+                {/* The user's name and email sit directly under the avatar because they are the core identity fields. */}
                 <div className="mt-4 text-center">
                   <h2 className="text-lg font-semibold">{session.user.name || "Unnamed User"}</h2>
                   <p className="text-sm text-muted-foreground">{session.user.email}</p>
                 </div>
 
-                {/* Verified Badge */}
+                {/* Email verification gets a badge so trust status is visible without reading a paragraph. */}
                 {session.user.emailVerified && (
                   <Badge variant="secondary" className="mt-3 gap-1">
                     <Check className="size-3" />
@@ -256,7 +266,7 @@ export default function ProfilePage() {
                   </Badge>
                 )}
 
-                {/* Quick Stats */}
+                {/* Small account metadata lives here because it is useful but not primary. */}
                 <Separator className="my-4 w-full" />
                 <div className="w-full space-y-3">
                   <div className="flex items-center gap-3 text-sm">
@@ -271,9 +281,9 @@ export default function ProfilePage() {
             </Card>
           </div>
 
-          {/* Right Column — Details */}
+          {/* The right column holds editable details and security context because that is the part users change most. */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Personal Information Card */}
+            {/* Personal information stays in its own card so edit/save actions stay obvious. */}
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -327,7 +337,7 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
                 <div className="grid gap-5 sm:grid-cols-2">
-                  {/* Full Name */}
+                  {/* Full name is editable because it is the user's primary display label. */}
                   <div className="space-y-2">
                     <Label className="text-muted-foreground">Full Name</Label>
                     {isEditing ? (
@@ -342,7 +352,7 @@ export default function ProfilePage() {
                     )}
                   </div>
 
-                  {/* Email */}
+                  {/* Email is shown for reference only because it is tied to the auth provider. */}
                   <div className="space-y-2">
                     <Label className="text-muted-foreground">Email Address</Label>
                     <div className="flex items-center gap-2">
@@ -353,7 +363,7 @@ export default function ProfilePage() {
                     </div>
                   </div>
 
-                  {/* GitHub Username */}
+                  {/* GitHub and LeetCode usernames are grouped here because they drive sync behavior elsewhere in the app. */}
                   <div className="space-y-2">
                     <Label className="text-muted-foreground">GitHub Username</Label>
                     {isEditing ? (
@@ -368,7 +378,6 @@ export default function ProfilePage() {
                     )}
                   </div>
 
-                  {/* LeetCode Username */}
                   <div className="space-y-2">
                     <Label className="text-muted-foreground">LeetCode Username</Label>
                     {isEditing ? (
@@ -386,7 +395,7 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
 
-            {/* Security Overview Card */}
+            {/* The security card gives a quick status snapshot without forcing the user into settings. */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -426,7 +435,7 @@ export default function ProfilePage() {
               </CardContent>
             </Card>
 
-            {/* Connected Accounts Card */}
+            {/* Connected accounts show which social providers are already linked to this profile. */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -437,7 +446,7 @@ export default function ProfilePage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {/* Google */}
+                  {/* Google is listed separately so the user can connect or confirm it at a glance. */}
                   <div className="flex items-center justify-between rounded-lg border p-4">
                     <div className="flex items-center gap-3">
                       <svg viewBox="0 0 24 24" className="size-5">
@@ -488,7 +497,7 @@ export default function ProfilePage() {
                     )}
                   </div>
 
-                  {/* GitHub */}
+                  {/* GitHub gets its own row because it is the sync source for platform activity. */}
                   <div className="flex items-center justify-between rounded-lg border p-4">
                     <div className="flex items-center gap-3">
                       <svg viewBox="0 0 24 24" fill="currentColor" className="size-5">

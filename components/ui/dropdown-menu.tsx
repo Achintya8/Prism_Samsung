@@ -6,12 +6,14 @@ import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui"
 import { cn } from "@/lib/utils"
 import { CheckIcon, ChevronRightIcon } from "lucide-react"
 
+// Dropdown menus power the navbar and settings menus, so the primitives are wrapped once here.
 function DropdownMenu({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Root>) {
   return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />
 }
 
+// Portals keep menus out of layout overflow so they can float above the page cleanly.
 function DropdownMenuPortal({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Portal>) {
@@ -20,6 +22,7 @@ function DropdownMenuPortal({
   )
 }
 
+// The trigger is a pass-through wrapper because Radix handles the open/close behavior.
 function DropdownMenuTrigger({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>) {
@@ -31,6 +34,7 @@ function DropdownMenuTrigger({
   )
 }
 
+// Content styling is centralized here so menu panels look identical across the app.
 function DropdownMenuContent({
   className,
   align = "start",
@@ -58,6 +62,7 @@ function DropdownMenuGroup({
   )
 }
 
+// Menu items share one structure so keyboard focus and hover states feel consistent.
 function DropdownMenuItem({
   className,
   inset,

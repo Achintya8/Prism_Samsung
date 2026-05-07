@@ -9,6 +9,7 @@ export function getOTPEmail({
 }) {
   const otpDigits = otp.split("");
 
+  // The OTP email is rendered as a full HTML document so it displays reliably in common mail clients.
   return `
 <!DOCTYPE html>
 <html lang="en">

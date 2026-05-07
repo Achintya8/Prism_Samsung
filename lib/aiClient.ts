@@ -1,5 +1,6 @@
 export type Provider = 'claude' | 'openai' | 'gemini'
 
+// When no API key is available, fall back to a predictable markdown note so the UI still has something useful to show.
 function fallbackNotes(prompt: string) {
   const source = prompt.split('\n').slice(1).join('\n').trim()
   const sentences = source.split(/[.!?]\s+/).map((item) => item.trim()).filter(Boolean)
@@ -21,15 +22,18 @@ function fallbackNotes(prompt: string) {
   ].join('\n')
 }
 
+// This helper hides the differences between OpenAI, Claude, and Gemini so the rest of the app can ask for notes once.
 export async function callAI(provider: Provider, prompt: string, apiKey?: string, instruction?: string) {
   if (!apiKey) {
     return fallbackNotes(prompt)
   }
 
+  // Keep the system message short and student-friendly unless the caller overrides it.
   const sysInstruction = instruction || 'Create concise, student-friendly markdown notes with summary, key points, and review prompts.'
 
   try {
     if (provider === 'openai') {
+      // OpenAI uses the chat-completions shape, so we format the prompt as system plus user messages.
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -53,6 +57,7 @@ export async function callAI(provider: Provider, prompt: string, apiKey?: string
     }
 
     if (provider === 'claude') {
+      // Claude expects the system instruction at the top level and the user content in messages.
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -76,6 +81,7 @@ export async function callAI(provider: Provider, prompt: string, apiKey?: string
     }
 
     if (provider === 'gemini') {
+      // Gemini uses a different request shape, but the app-level prompt stays the same.
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -92,8 +98,9 @@ export async function callAI(provider: Provider, prompt: string, apiKey?: string
       return json.candidates?.[0]?.content?.parts?.[0]?.text || fallbackNotes(prompt)
     }
   } catch (error) {
+    // Bubble the error up so the caller can show the failure instead of pretending the request succeeded.
     console.error('AI call failed:', error)
-    throw error // Bubble up the error so the UI shows it instead of failing silently
+    throw error
   }
 
   return fallbackNotes(prompt)

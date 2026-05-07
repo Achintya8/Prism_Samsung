@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+// Auth schemas live in one place so the login and signup forms can share the same validation rules.
 export const signupSchema = z
   .object({
     name: z
@@ -24,15 +25,18 @@ export const signupSchema = z
     path: ["confirmPassword"],
   });
 
+// Login only needs credentials, so the schema stays intentionally small.
 export const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
   password: z.string().min(1, "Password is required"),
 });
 
+// Password reset requests only need an email address because the actual reset happens by email link.
 export const forgotPasswordSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
 });
 
+// Reset password requires confirmation so users do not accidentally lock themselves out with a typo.
 export const resetPasswordSchema = z
   .object({
     password: z.string().min(8, "Password must be at least 8 characters long"),

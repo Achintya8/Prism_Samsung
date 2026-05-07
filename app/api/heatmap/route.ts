@@ -5,14 +5,17 @@ import connectToDB from '@/lib/mongodb'
 import { Activity } from '@/lib/models/Activity'
 import { DailyActivityLog } from '@/lib/models/DailyActivityLog'
 
+// This endpoint packages yearly activity into a heatmap-friendly structure for the calendar view.
 export async function GET(request: Request) {
   try {
+    // Heatmap data is private, so we always verify the caller first.
     const session = await auth.api.getSession({ headers: await headers() })
     if (!session?.user?.id) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 401 })
     }
     const userId = session.user.id
 
+    // The year filter lets the UI request a precise window without downloading every record.
     const { searchParams } = new URL(request.url)
     const yearStr = searchParams.get('year') || String(new Date().getFullYear())
     const year = parseInt(yearStr, 10)
@@ -23,6 +26,7 @@ export async function GET(request: Request) {
 
     await connectToDB()
 
+    // Daily logs are the source of truth for whether a day should appear active on the grid.
     const logs = await DailyActivityLog.find({
       userId,
       date: { $gte: `${year}-01-01`, $lte: `${year}-12-31` },
@@ -30,6 +34,7 @@ export async function GET(request: Request) {
       .sort({ date: 1 })
       .lean()
 
+    // Activity titles are collected separately so the hover tooltip can show what happened on each active day.
     const activities = await Activity.find({
       userId,
       date: {
@@ -41,6 +46,7 @@ export async function GET(request: Request) {
       .select('title date')
       .lean()
 
+    // Group activity titles by day so the front end can render a compact tooltip per cell.
     const activitiesByDate = activities.reduce<Record<string, string[]>>((acc, activity) => {
       const date = new Date(activity.date).toISOString().slice(0, 10)
       if (!acc[date]) acc[date] = []
@@ -48,6 +54,7 @@ export async function GET(request: Request) {
       return acc
     }, {})
 
+    // Merge counts and titles into one calendar-friendly payload.
     const heatmapData = logs.map((log) => ({
       date: log.date,
       count: log.totalCount,
@@ -56,6 +63,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({ ok: true, year, data: heatmapData })
   } catch (error) {
+    // Return a safe server error if either collection query fails.
     console.error('Heatmap GET Error:', error)
     return NextResponse.json({ ok: false, error: 'Internal Server Error' }, { status: 500 })
   }

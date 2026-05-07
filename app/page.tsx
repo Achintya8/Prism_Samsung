@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 /* ─── Typewriter hook ─────────────────────────────── */
+// The typewriter effect gives the hero copy a little motion without needing a full animation library.
 function useTypewriter(words: string[], speed: number = 80, pause: number = 2000) {
   const [display, setDisplay] = useState("");
   const [wordIdx, setWordIdx] = useState(0);
@@ -38,6 +39,7 @@ function useTypewriter(words: string[], speed: number = 80, pause: number = 2000
 }
 
 /* ─── Animated counter hook ──────────────────────── */
+// These counters animate only after the stats section is visible so the numbers feel intentional, not noisy.
 function useCounter(target: number, duration: number = 1800, start: boolean = false) {
   const [count, setCount] = useState(0);
   useEffect(() => {
@@ -56,6 +58,7 @@ function useCounter(target: number, duration: number = 1800, start: boolean = fa
 }
 
 /* ─── Particle canvas ─────────────────────────────── */
+// The star field is a lightweight canvas background that makes the landing page feel alive.
 function StarField() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -113,6 +116,7 @@ function StarField() {
 }
 
 /* ─── Stats row ───────────────────────────────────── */
+// Each stat item is just a number plus label, kept separate so the animated counters stay reusable.
 function StatItem({
   target,
   suffix,
@@ -139,6 +143,7 @@ function StatItem({
 }
 
 /* ─── Feature card ────────────────────────────────── */
+// Feature cards reuse one visual treatment so the landing page can scale without copy-pasting card markup.
 function FeatureCard({
   icon: Icon,
   title,
@@ -230,6 +235,7 @@ function Marquee() {
 }
 
 /* ─── Main Page ───────────────────────────────────── */
+// The landing page is structured as a guided sales page: hero, proof, features, then a final conversion prompt.
 export default function LandingPage() {
   const typed = useTypewriter(
     ["placement prep.", "DSA mastery.", "leaderboard glory.", "career success."],
@@ -237,7 +243,7 @@ export default function LandingPage() {
     1800,
   );
 
-  /* Trigger counter when stats section enters view */
+  // Start the counters only once the stats block is actually on screen.
   const statsRef = useRef(null);
   const [statsStarted, setStatsStarted] = useState(false);
   useEffect(() => {
@@ -257,7 +263,7 @@ export default function LandingPage() {
     <div className="flex flex-col items-center bg-black overflow-x-hidden min-h-screen relative">
       <StarField />
 
-      {/* Grid overlay */}
+      {/* The subtle grid overlay gives the dark hero some structure without stealing attention. */}
       <div
         className="fixed inset-0 pointer-events-none"
         style={{
@@ -268,10 +274,10 @@ export default function LandingPage() {
         }}
       />
 
-      {/* ── HERO ── */}
+      {/* The hero needs to explain the product in one glance, then immediately offer a path forward. */}
       <section className="relative z-10 w-full pt-28 pb-10 md:pt-44">
         <div className="container px-4 text-center max-w-5xl mx-auto">
-          {/* Eyebrow badge */}
+          {/* The badge gives the page an immediate status cue before the headline lands. */}
           <div className="anim-badge inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 mb-8">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75" />
@@ -282,14 +288,14 @@ export default function LandingPage() {
             </span>
           </div>
 
-          {/* Heading */}
+          {/* The headline names the product first so the rest of the page has a clear anchor. */}
           <h1 className="anim-0 text-6xl md:text-8xl font-black tracking-tight leading-[0.95] mb-6">
             <span className="bg-linear-to-b from-white via-white to-zinc-500 bg-clip-text text-transparent">
               ProductivityHub
             </span>
           </h1>
 
-          {/* Typewriter sub-headline */}
+          {/* The typewriter line cycles through the main promises without overcrowding the hero. */}
           <p className="anim-1 text-xl md:text-2xl font-semibold text-zinc-300 mb-4 h-8">
             Built for{" "}
             <span className="text-blue-400">
@@ -303,7 +309,7 @@ export default function LandingPage() {
             and solve challenges together.
           </p>
 
-          {/* CTA buttons */}
+          {/* Two CTAs cover both user states: new signup and returning login. */}
           <div className="anim-3 mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link href="/signup">
               <Button
@@ -339,27 +345,27 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          {/* Trust micro-copy */}
+          {/* A small proof line helps the hero feel concrete instead of purely promotional. */}
           <p className="mt-5 text-zinc-600 text-xs tracking-wide">
             Free to join · No credit card required · 2,400+ students enrolled
           </p>
         </div>
       </section>
 
-      {/* ── MARQUEE ── */}
+      {/* The marquee keeps the page moving and reinforces the kinds of work the app supports. */}
       <div className="relative z-10 w-full mt-6">
         <Marquee />
       </div>
 
-      {/* ── DASHBOARD PREVIEW ── */}
+      {/* The dashboard preview shows the product before the user has to imagine it. */}
       <section className="relative z-10 w-full max-w-6xl px-4 py-16">
         <div className="relative group">
-          {/* Multi-layer glow */}
+          {/* Layered glow makes the preview feel like a featured product, not a plain screenshot. */}
           <div className="absolute -inset-px bg-linear-to-r from-blue-600 via-violet-600 to-blue-600 rounded-3xl opacity-20 group-hover:opacity-40 transition-opacity duration-700 blur-2xl" />
           <div className="absolute -inset-px bg-linear-to-r from-blue-600 via-violet-600 to-blue-600 rounded-3xl opacity-10" />
 
           <div className="relative rounded-3xl border border-zinc-800 bg-zinc-950 p-3 shadow-[0_0_80px_rgba(0,0,0,0.8)]">
-            {/* Top bar dots */}
+            {/* The faux window controls frame the screenshot as a product mock, not a random image. */}
             <div className="flex items-center gap-1.5 px-3 pb-2">
               <span className="w-3 h-3 rounded-full bg-zinc-700" />
               <span className="w-3 h-3 rounded-full bg-zinc-700" />
@@ -378,7 +384,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Floating badge — top right */}
+          {/* The floating badges call out a couple of concrete wins so the preview feels credible. */}
           <div
             className="absolute -top-4 -right-2 md:right-6 flex items-center gap-2 
                        rounded-full bg-zinc-900 border border-zinc-700 px-4 py-2 shadow-xl
@@ -391,7 +397,6 @@ export default function LandingPage() {
             </span>
           </div>
 
-          {/* Floating badge — bottom left */}
           <div
             className="absolute -bottom-4 -left-2 md:left-8 flex items-center gap-2 
                        rounded-full bg-zinc-900 border border-zinc-700 px-4 py-2 shadow-xl"
@@ -405,7 +410,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── STATS ── */}
+      {/* Stats build social proof with simple numbers that are easy to scan quickly. */}
       <section ref={statsRef} className="relative z-10 w-full max-w-4xl px-4 py-12">
         <div
           className="grid grid-cols-2 md:grid-cols-4 gap-8 rounded-2xl border border-zinc-800/60 
@@ -418,7 +423,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── FEATURES ── */}
+      {/* The features block translates the product into specific use cases. */}
       <section className="relative z-10 w-full max-w-6xl px-4 py-16">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-black text-white mb-3">
@@ -469,10 +474,10 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ── FINAL CTA ── */}
+      {/* The final CTA repeats the promise once the visitor has seen enough proof to act. */}
       <section className="relative z-10 w-full max-w-3xl px-4 pb-32 pt-4 text-center">
         <div className="relative rounded-3xl border border-zinc-800 bg-zinc-950/80 px-8 py-16 overflow-hidden">
-          {/* background glow */}
+          {/* The background glow keeps the closing block visually distinct from the rest of the page. */}
           <div className="absolute inset-0 bg-linear-to-br from-blue-900/20 via-transparent to-violet-900/20 pointer-events-none" />
           <h2 className="relative text-3xl md:text-5xl font-black text-white mb-4">
             Your placement journey

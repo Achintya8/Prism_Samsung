@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import z from "zod";
 
+// Signup collects the bare minimum needed to create an account and optionally lets the user personalize it right away.
 export default function SignupPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -24,6 +25,7 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
+  // The form is set up once so validation and defaults stay aligned with the signup schema.
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema as any),
     defaultValues: {
@@ -35,6 +37,7 @@ export default function SignupPage() {
     },
   });
 
+  // Image selection is isolated because the preview needs to update before the account is actually created.
   const handleImageSelect = useCallback(
     (file: File) => {
       form.setValue("image", file);
@@ -45,6 +48,7 @@ export default function SignupPage() {
     [form],
   );
 
+  // Drag and drop is treated the same as clicking browse so the upload experience feels consistent.
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
@@ -57,6 +61,7 @@ export default function SignupPage() {
     [handleImageSelect],
   );
 
+  // Submit creates the account, then sends the user straight to email verification.
   const onSubmit = async (data: z.infer<typeof signupSchema>) => {
     setIsLoading(true);
     try {
@@ -87,7 +92,7 @@ export default function SignupPage() {
 
   return (
     <div className="w-full max-w-md px-6">
-      {/* Header */}
+      {/* The header keeps the sign-up flow direct and low-friction. */}
       <div className="mb-8 text-center">
         <h1 className="text-3xl font-bold tracking-tight">Create an Account</h1>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -101,10 +106,10 @@ export default function SignupPage() {
         </p>
       </div>
 
-      {/* Form */}
+      {/* The form is intentionally short so the user can get through account creation quickly. */}
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <FieldGroup className="gap-3">
-          {/* Name */}
+          {/* Name is collected first because it becomes the visible identity across the app. */}
           <Controller
             name="name"
             control={form.control}
@@ -123,7 +128,7 @@ export default function SignupPage() {
             )}
           />
 
-          {/* Email */}
+          {/* Email is the account anchor and the destination for verification messages. */}
           <Controller
             name="email"
             control={form.control}
@@ -145,11 +150,11 @@ export default function SignupPage() {
             )}
           />
 
-          {/* Profile Picture */}
+          {/* The profile picture is optional, but this is the easiest place to invite personalization. */}
           <Field>
             <FieldLabel className="text-sm font-semibold">Profile Picture (Optional)</FieldLabel>
             <div className="flex items-center gap-4">
-              {/* Upload preview area */}
+              {/* The preview box doubles as the upload drop zone so the interaction is easy to discover. */}
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
@@ -180,7 +185,7 @@ export default function SignupPage() {
                 )}
               </button>
 
-              {/* Browse button */}
+              {/* The browse button gives a second, more explicit upload path for users who prefer clicks. */}
               <div className="flex flex-col items-start gap-1.5">
                 <Button
                   type="button"
@@ -211,7 +216,7 @@ export default function SignupPage() {
             </div>
           </Field>
 
-          {/* Password */}
+          {/* Password entry sits below identity fields because it is a required but less descriptive detail. */}
           <Controller
             name="password"
             control={form.control}
@@ -240,7 +245,7 @@ export default function SignupPage() {
             )}
           />
 
-          {/* Confirm Password */}
+          {/* Confirm password reduces avoidable mistakes before the account is created. */}
           <Controller
             name="confirmPassword"
             control={form.control}
@@ -273,7 +278,7 @@ export default function SignupPage() {
             )}
           />
 
-          {/* Submit Button */}
+          {/* The submit button stays prominent because this is the only irreversible step on the page. */}
           <Button
             type="submit"
             disabled={isLoading}
@@ -284,7 +289,7 @@ export default function SignupPage() {
         </FieldGroup>
       </form>
 
-      {/* Terms Footer */}
+      {/* Legal links are placed at the bottom so they do not compete with the signup action. */}
       <p className="mt-6 text-center text-sm text-muted-foreground">
         By clicking continue, you agree to our{" "}
         <Link href="/terms" className="underline underline-offset-4 hover:text-foreground">

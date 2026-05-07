@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getFeed } from '@/lib/feature-store'
 
+// This feed endpoint is intentionally lightweight because it just proxies the feature-store data.
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const userId = searchParams.get('userId') || 'demo-user'
