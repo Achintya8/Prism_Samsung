@@ -11,7 +11,7 @@ const TOUR_PAGE_IDX = "tour_page_idx"; // index into TOUR_FLOW
 
 const TOUR_FLOW: {
   path: string;
-  steps: () => Parameters<typeof driver>[0]["steps"];
+  steps: () => NonNullable<Parameters<typeof driver>[0]>["steps"];
 }[] = [
   {
     path: "/dashboard",

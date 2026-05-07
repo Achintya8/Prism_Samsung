@@ -6,12 +6,26 @@ import { authClient } from "@/lib/auth-client";
 import { CheckCircle, LoaderIcon, Mail, KeyRound, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
+import { Suspense, useState, useRef, useEffect } from "react";
 import { toast } from "sonner";
 
 type VerifyMethod = "magic-link" | "otp";
 
 export default function VerifyEmailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex w-full max-w-md items-center justify-center px-6 py-16">
+          <LoaderIcon className="size-5 animate-spin text-muted-foreground" />
+        </div>
+      }
+    >
+      <VerifyEmailContent />
+    </Suspense>
+  );
+}
+
+function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email") || "";
   const router = useRouter();

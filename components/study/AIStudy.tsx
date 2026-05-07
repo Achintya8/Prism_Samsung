@@ -478,8 +478,7 @@ export function AIStudy() {
           {/* In whiteboard mode the back button is the main way to leave the canvas without losing context. */}
           <button
             onClick={handleBack}
-            disabled={view === 'quiz' && quizLoading}
-            className="p-2 hover:bg-muted rounded-lg disabled:opacity-50 disabled:cursor-not-allowed w-fit"
+            className="p-2 hover:bg-muted rounded-lg w-fit"
           >
             <ArrowLeft className="w-5 h-5 text-foreground/70" />
           </button>
@@ -525,7 +524,6 @@ export function AIStudy() {
           {view === 'notes' && selectedSubject && `${selectedSubject.name} - ${selectedSubject.notesCount} notes`}
           {view === 'noteDetail' && selectedNote && selectedNote.title}
           {view === 'quiz' && 'Practice quiz'}
-          {view === 'whiteboard' && 'Whiteboard'}
         </p>
         {status && (
           <p className={`text-sm mt-2 ${status.includes('saved') || status.includes('created') ? 'text-green-600' : 'text-red-600'}`}>
