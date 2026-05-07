@@ -38,11 +38,11 @@ export async function POST() {
         : Promise.resolve(),
     ]);
 
-    // App-owned data uses mongoose; some schemas store userId as ObjectId, others as string.
+    // Pass the string id and let each mongoose schema cast it via Schema.Types.ObjectId.
     await connectToDB();
     await Promise.all([
-      Activity.deleteMany({ userId: userObjectId }),
-      Subject.deleteMany({ userId: userObjectId }),
+      Activity.deleteMany({ userId }),
+      Subject.deleteMany({ userId }),
       DailyActivityLog.deleteMany({ userId }),
       Connection.deleteMany({ userId }),
     ]);
